@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+    </head>
+    <body>
+
+        <!--
+        <script>
+            var sceneSeed = #{SceneCode};
+            console.log("Scene Code from Pug",sceneSeed);
+        </script>
+        -->
+        
+        <script src="/socket.io/socket.io.js"></script>
+        <!--<script src="http://labs.phaser.io/build/dev.js"></script>-->
+        <script src="//cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.js"></script>
+        <script src="//cdn.jsdelivr.net/npm/@mikewesthad/dungeon@1.2.1"></script>
+        <script src="js/game.js" type="module"></script>
+    </body>
+</html>
