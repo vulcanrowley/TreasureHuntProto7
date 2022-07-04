@@ -1,8 +1,19 @@
 import Player from "/js/player.js";
-import OtherPlayer from "/js/OtherPlayer.1.js"
+
 import TILES from "/js/tile-mapping.js";
 import TilemapVisibility from "/js/tilemap-visibility.js";
 
+/******************************************************
+ * Massive Base Class and supporting function
+ * ------------------------------------------
+ * Has two main sections
+ * - DungeonGeneration - builds a dungeon and populates rooms with
+ * -- food jugs, a Treasure and two Exits
+ * -- each client generates and has his own copy of the dungeon map but size all
+ * --- clients use the same scene seed, they are all the same
+ * - Player functions controlled by server
+ * -- movement, collisions, etc
+ */
 export default class DungeonScene extends Phaser.Scene {
   constructor() {
     super({ key: 'DungeonScene' })
@@ -37,13 +48,13 @@ export default class DungeonScene extends Phaser.Scene {
 
   create() {
     var self = this;
-      // Generate a random world with a few extra options:
+      // Generate a random world based on sceneSeed with a few extra options:
       //  - Rooms should only have odd number dimensions so that they have a center tile.
       //  - Doors should be at least 2 tiles away from corners, so that we can place a corner tile on
       //    either side of the door location
       this.dungeon = new Dungeon({
-      width: 50,
-      height: 50,
+      width: 30,
+      height: 30,
       doorPadding: 2,
       randomSeed: this.sceneSeed,//this.level,
       rooms: {
@@ -130,8 +141,7 @@ export default class DungeonScene extends Phaser.Scene {
       this.stuffLayer.putTilesAt([152,153], endRoom1.centerX, endRoom1.centerY);
       this.stuffLayer.putTilesAt(TILES.EXIT, endRoom2.centerX, endRoom2.centerY);
 
-      this.stuffLayer.setTileIndexCallback(13, this.hitJug, this);
-      //this.physics.add.overlap(this.player.sprite, StuffLayer);
+      
 
       // Place stuff in the 90% "otherRooms"
       otherRooms.forEach((room) => {
@@ -186,6 +196,16 @@ export default class DungeonScene extends Phaser.Scene {
       // do for the example.
       this.groundLayer.setCollisionByExclusion([-1, 6, 7, 8, 26]);
       this.stuffLayer.setCollisionByExclusion([-1, 6, 7, 8, 26]);
+
+      // more collision stuff
+      // collision with jug tile
+      this.stuffLayer.setTileIndexCallback(13, this.hitJug, this);
+      //this.physics.add.overlap(this.player.sprite, StuffLayer);
+      //collision with Treasure Cheast tile
+      this.stuffLayer.setTileIndexCallback(166, this.hitTreasure, this);
+      //collision with Exit tile
+      this.stuffLayer.setTileIndexCallback(TILES.EXIT, this.hitExit, this);
+
 
       //map.setCollision(13);
 
@@ -244,7 +264,7 @@ export default class DungeonScene extends Phaser.Scene {
       .setScrollFactor(0);
 
     //SocketIO Setup
-    // Based on https://github.com/ivangfr/socketio-express-phaser3
+    // Drived From https://github.com/ivangfr/socketio-express-phaser3
 
     var self = this;
     this.socket = io();
@@ -272,7 +292,7 @@ export default class DungeonScene extends Phaser.Scene {
         })
       })
     
-      //this.cursors = this.input.keyboard.createCursorKeys()
+    
     
       this.socket.on('playerMoved', function (playerInfo) {
         self.otherPlayers.getChildren().forEach(function (otherPlayer) {
@@ -294,6 +314,11 @@ export default class DungeonScene extends Phaser.Scene {
         //this.map.removeTileAt(jug.x, jug.y,false,false,this.stuffLayer);
       })
 
+      this.socket.on('treasureFound', function(chest){
+        
+        self.removeItem(chest);
+      })
+
       this.socket.on('healthUpdate', function (players) {
         Object.keys(players).forEach(function (id) {
           if (players[id].playerId === self.socket.id) {
@@ -309,6 +334,23 @@ export default class DungeonScene extends Phaser.Scene {
   {
     this.socket.emit('jugHit', { x: tile.x,y: tile.y})
     this.stuffLayer.removeTileAt(tile.x, tile.y,false,false,this.stuffLayer);
+    //console.log("hit jug at"+tile.x+" , "+tile.y)
+  }
+
+  hitExit (sprite, tile)
+  {
+    this.socket.emit('exitHit', { x: tile.x,y: tile.y})
+    this.stuffLayer.removeTileAt(tile.x, tile.y,false,false,this.stuffLayer);
+    //console.log("hit jug at"+tile.x+" , "+tile.y)
+  }
+
+  hitTreasure (sprite, tile)
+  {
+    this.socket.emit('treasureHit', { x: tile.x,y: tile.y})
+    this.stuffLayer.removeTileAt(tile.x, tile.y,false,false,this.stuffLayer);
+    this.player.sprite.setTint(0xfafad2);
+    this.player.hasTreasure= true; 
+    this.player.speed = 150; 
     //console.log("hit jug at"+tile.x+" , "+tile.y)
   }
 
@@ -341,10 +383,6 @@ export default class DungeonScene extends Phaser.Scene {
     otherPlayer.playerId = playerInfo.playerId
     otherPlayer.setTint(playerInfo.color)
     self.otherPlayers.add(otherPlayer)
-    // Watch the player and tilemap layers for collisions, for the duration of the scene:
-    
-    //this.physics.add.collider(otherPlayer, this.groundLayer);
-    //this.physics.add.collider(otherPlayer, this.stuffLayer);
 
   }
 
@@ -365,7 +403,7 @@ export default class DungeonScene extends Phaser.Scene {
       var y = this.player.sprite.y
       //console.log(" player: "+this.player.id+"  "+x+" , "+y);
       if (this.player.oldPosition && (x !== this.player.oldPosition.x || y !== this.player.oldPosition.y )) {
-        
+        // tell server where we moved to
         this.socket.emit('playerMovement', { x: this.player.sprite.x, y: this.player.sprite.y})
       }
   

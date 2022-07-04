@@ -58,6 +58,7 @@ const TILE_MAPPING = {
     [186],
     [205]
   ],
+  EXIT: [152,153]
 };
 
 export default TILE_MAPPING;

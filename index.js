@@ -142,10 +142,10 @@ io.on('connection', function (socket) {
 })
 
 function getRandomColor() {
-  // but not gold 0xffd700; reserved for player carrying treasure
+  // but not gold 0x0xfafad2; reserved for player carrying treasure
 
   varColor = '0x' + Math.floor(Math.random() * 16777215).toString(16);
-  while(varColor == "0xffd700"){
+  while(varColor == "0xfafad2"){
       varColor = '0x' + Math.floor(Math.random() * 16777215).toString(16);
     }
   return varColor;

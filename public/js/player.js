@@ -6,6 +6,7 @@ export default class Player {
     this.health =100;
     this.x = x;
     this.y = y;
+    this.speed = 300;
     
     const anims = scene.anims;
     anims.create({
@@ -36,7 +37,7 @@ export default class Player {
   update() {
     const keys = this.keys;
     const sprite = this.sprite;
-    const speed = 300;
+    const speed = this.speed;
     const prevVelocity = sprite.body.velocity.clone();
 
     // Stop any previous movement from the last frame
