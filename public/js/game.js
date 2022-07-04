@@ -14,27 +14,22 @@ var config = {
   width: 800,
   height: 600,
   active: false,
+  seed: 5,
   physics: {
     default: "arcade",
     arcade: {
       debug: false,
       gravity: { y: 0 },
     },
-  },
-  /*
-  scene: {
-      preload: preload,
-      create: create
   }
-  */
   // need to add scene manually to enable data transfer from game.js
- //scene: [DungeonScene]
+
  
 };
 
 
 var game = new Phaser.Game(config);
-console.log('sceneSeed in Game.js '+sceneSeed);
+//console.log('sceneSeed in Game.js '+sceneSeed);
 // set active to false in config
 // dont set scene in config
 // add scene using key from scene modulle

@@ -1,4 +1,5 @@
 import Player from "/js/player.js";
+import OtherPlayer from "/js/OtherPlayer.1.js"
 import TILES from "/js/tile-mapping.js";
 import TilemapVisibility from "/js/tilemap-visibility.js";
 
@@ -10,14 +11,17 @@ export default class DungeonScene extends Phaser.Scene {
 
   init (data)// used to transfer data into scene from scene.start
   {
-      console.log('seed transfered to Dungeon', data.seed);
-  
+      //console.log('seed transfered to Dungeon', data.seed);
+      // sceneSeed set by server to make all client scenes the same
       this.sceneSeed = data.seed;
+
+      //game.stage.disableVisibilityChange = true;// maybe game.scene???
+};
       
-  }
 
   preload() {
       this.load.image("tiles", "../assets/tilesets/buch-tileset-48px-extruded.png");
+      this.load.image("other", "../assets/star_gold.png");
       this.load.spritesheet(
       "characters",
       "../assets/spritesheets/buch-characters-64px-extruded.png",
@@ -32,7 +36,7 @@ export default class DungeonScene extends Phaser.Scene {
   }
 
   create() {
-
+    var self = this;
       // Generate a random world with a few extra options:
       //  - Rooms should only have odd number dimensions so that they have a center tile.
       //  - Doors should be at least 2 tiles away from corners, so that we can place a corner tile on
@@ -48,7 +52,8 @@ export default class DungeonScene extends Phaser.Scene {
       },
       });
 
-      this.dungeon.drawToConsole();
+      // draw diagnostic map in console
+      //this.dungeon.drawToConsole();
 
       // Creating a blank tilemap with dimensions matching the dungeon
       const map = this.make.tilemap({
@@ -108,11 +113,16 @@ export default class DungeonScene extends Phaser.Scene {
       const rooms = this.dungeon.rooms.slice();
       // segregate special rooms
       const startRoom = rooms.shift();
-      const goalRoom = Phaser.Utils.Array.RemoveRandomElement(rooms);
-      const endRoom1 = Phaser.Utils.Array.RemoveRandomElement(rooms);
-      const endRoom2 = Phaser.Utils.Array.RemoveRandomElement(rooms);
-      const otherRooms = Phaser.Utils.Array.Shuffle(rooms).slice(0, rooms.length * 0.98);
+      const goalRoom =Phaser.Utils.Array.RemoveAt(rooms,rooms.length-1);
+      //const goalRoom = Phaser.Utils.Array.RemoveRandomElement(rooms);
+      const endRoom1 =Phaser.Utils.Array.RemoveAt(rooms,rooms.length-1);
+      //const endRoom1 = Phaser.Utils.Array.RemoveRandomElement(rooms);
+      const endRoom2 =Phaser.Utils.Array.RemoveAt(rooms,rooms.length-1);
+      //const endRoom2 = Phaser.Utils.Array.RemoveRandomElement(rooms);
 
+      const otherRooms = Phaser.Utils.Array.Shuffle(rooms).slice(0, rooms.length * 0.98);
+      this.px = map.tileToWorldX(startRoom.centerX);
+      this.py = map.tileToWorldY(startRoom.centerY);
       // Place the Treasure
       this.stuffLayer.putTileAt(TILES.CHEST, goalRoom.centerX, goalRoom.centerY);
 
@@ -120,15 +130,27 @@ export default class DungeonScene extends Phaser.Scene {
       this.stuffLayer.putTilesAt([152,153], endRoom1.centerX, endRoom1.centerY);
       this.stuffLayer.putTilesAt(TILES.EXIT, endRoom2.centerX, endRoom2.centerY);
 
+      this.stuffLayer.setTileIndexCallback(13, this.hitJug, this);
+      //this.physics.add.overlap(this.player.sprite, StuffLayer);
+
       // Place stuff in the 90% "otherRooms"
       otherRooms.forEach((room) => {
           //console.log("room "+room.centerX);
-          //console.log(" side wall -"+ room.left+" "+room.right  );
+          let width = room.right-room.left;
+          let height = room.bottom-room.top;
+          //console.log("width "+ width +" height "+ height );
           const rand = Math.floor(Math.random()*3) // random between 0-2 inclusive
-          this.stuffLayer.putTilesAt(TILES.POT, room.centerX - 1, room.centerY + 1);
-          this.stuffLayer.putTilesAt(TILES.POT, room.centerX + 1, room.centerY + 1);
-          this.stuffLayer.putTilesAt(TILES.POT, room.centerX - 1, room.centerY - 2);
-          this.stuffLayer.putTilesAt(TILES.POT, room.centerX + 1, room.centerY - 2);
+          if(width*height > 100){
+            this.stuffLayer.putTilesAt([13], room.centerX - 1, room.centerY + 1);
+            this.stuffLayer.putTilesAt([13], room.centerX + 1, room.centerY + 1);
+            this.stuffLayer.putTilesAt([13], room.centerX - 2, room.centerY - 2);
+            this.stuffLayer.putTilesAt([13], room.centerX + 2, room.centerY - 2);
+          }else if(width*height< 50){
+            this.stuffLayer.putTilesAt([13], room.centerX, room.centerY );
+          }else{
+            this.stuffLayer.putTilesAt([13], room.centerX + 1, room.centerY + 1);
+            this.stuffLayer.putTilesAt([13], room.centerX - 1, room.centerY - 2);
+          }
           /*
           const rand = Math.random();
           
@@ -165,41 +187,51 @@ export default class DungeonScene extends Phaser.Scene {
       this.groundLayer.setCollisionByExclusion([-1, 6, 7, 8, 26]);
       this.stuffLayer.setCollisionByExclusion([-1, 6, 7, 8, 26]);
 
-      this.stuffLayer.setTileIndexCallback(TILES.STAIRS, () => {
-          this.stuffLayer.setTileIndexCallback(TILES.STAIRS, null);
+      //map.setCollision(13);
+
+      /*
+      this.stuffLayer.setTileIndexCallback([13], (tile) => {
+          this.stuffLayer.setTileIndexCallback([13], null);
+          console.log("hit jug "+tile.x+" , "+tile.y);
+          //this.stuffLayer.removeTileAt(tile.x, tile.y);
+          //this.stuffLayer.removeTileAtWorldXY(tile.x, tile.y);
+          map.removeTileAt(tile.x, tile.y,false,false,this.stuffLayer);
+          this.player.health += 10;
+          console.log("player health "+ this.player.health);
           //this.hasPlayerReachedStairs = true;
           //this.player.freeze();
-          const cam = this.cameras.main;
-          cam.fade(250, 0, 0, 0);
-          cam.once("camerafadeoutcomplete", () => {
+          //const cam = this.cameras.main;
+          //cam.fade(250, 0, 0, 0);
+          //cam.once("camerafadeoutcomplete", () => {
               //this.player.destroy();
-              this.scene.restart();
-          });
+              //this.scene.restart();
+          //});
       });
+      */
+
       ////// END of DUNGEON GENERATION
 
-      // Game Code
+    // Original player coode
+          // Place the player in the first room
+    /*      
+    const playerRoom = startRoom;
+    const x = map.tileToWorldX(playerRoom.centerX);
+    const y = map.tileToWorldY(playerRoom.centerY);
+    this.player = new Player(this, x, y);
 
-      this.socket = io();
-      var players = {};
-  
+    //Watch the player and tilemap layers for collisions, for the duration of the scene:
+    this.physics.add.collider(this.player.sprite, this.groundLayer);
+    this.physics.add.collider(this.player.sprite, this.stuffLayer);
 
-      // Place the player in the first room
-      const playerRoom = startRoom;
-      const x = map.tileToWorldX(playerRoom.centerX);
-      const y = map.tileToWorldY(playerRoom.centerY);
-      this.player = new Player(this, x, y);
 
-      // Watch the player and tilemap layers for collisions, for the duration of the scene:
-      this.physics.add.collider(this.player.sprite, this.groundLayer);
-      this.physics.add.collider(this.player.sprite, this.stuffLayer);
+*/
 
       // Phaser supports multiple cameras, but you can access the default camera like this:
-      const camera = this.cameras.main;
+      this.camera = this.cameras.main;
 
       // Constrain the camera so that it isn't allowed to move outside the width/height of tilemap
-      camera.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
-      camera.startFollow(this.player.sprite);
+      self.camera.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
+      //camera.startFollow(this.player.sprite);
 
       // Help text that has a "fixed" position on the screen
       this.add
@@ -211,14 +243,138 @@ export default class DungeonScene extends Phaser.Scene {
       })
       .setScrollFactor(0);
 
+    //SocketIO Setup
+    // Based on https://github.com/ivangfr/socketio-express-phaser3
+
+    var self = this;
+    this.socket = io();
+    this.otherPlayers = this.physics.add.group(); 
+
+    this.socket.on('currentPlayers', function (players) {
+        Object.keys(players).forEach(function (id) {
+          if (players[id].playerId === self.socket.id) {
+            self.addPlayer(self, players[id])
+          } else {
+            self.addOtherPlayers(self, players[id])
+          }
+        })
+      })
+    
+      this.socket.on('newPlayer', function (playerInfo) {
+        self.addOtherPlayers(self, playerInfo)
+      })
+    
+      this.socket.on('playerDisconnected', function (playerId) {
+        self.otherPlayers.getChildren().forEach(function (otherPlayer) {
+          if (playerId === otherPlayer.playerId) {
+            otherPlayer.destroy()
+          }
+        })
+      })
+    
+      //this.cursors = this.input.keyboard.createCursorKeys()
+    
+      this.socket.on('playerMoved', function (playerInfo) {
+        self.otherPlayers.getChildren().forEach(function (otherPlayer) {
+          if (playerInfo.playerId === otherPlayer.playerId) {
+            //console.log( " told "+otherPlayer.playerId+" moved to "+playerInfo.x);
+            // otherPlayer is just a sprite without animation at this point
+            // so setPosition works
+            otherPlayer.setPosition(playerInfo.x, playerInfo.y)
+          }
+        })
+      })
+
+      this.socket.on('jugRemoved', function(jug){
+        //console.log('other jug '+jug.x+" , "+jug.y);
+        self.removeItem(jug);
+
+        // these didn't work - couldn't find this.anything
+        //this.stuffLayer.removeTileAt(jug.x, jug.y,false,false,this.stuffLayer);
+        //this.map.removeTileAt(jug.x, jug.y,false,false,this.stuffLayer);
+      })
+
+      this.socket.on('healthUpdate', function (players) {
+        Object.keys(players).forEach(function (id) {
+          if (players[id].playerId === self.socket.id) {
+            self.player.health =players[id].health;
+            //console.log(" player: "+self.player.id+" health is "+self.player.health)
+          }
+        })
+      })
+
+  }// end of create function
+
+ hitJug (sprite, tile)
+  {
+    this.socket.emit('jugHit', { x: tile.x,y: tile.y})
+    this.stuffLayer.removeTileAt(tile.x, tile.y,false,false,this.stuffLayer);
+    //console.log("hit jug at"+tile.x+" , "+tile.y)
+  }
+
+  // needed this function to wrap this.stuff.remove... - not sure why
+  removeItem (item)
+  { 
+    this.stuffLayer.removeTileAt(item.x, item.y,false,false,this.stuffLayer);
+   // console.log("remove tile at"+item.x+" , "+item.y)
+  }
 
 
+  addPlayer(self, playerInfo) {
+    // Place the player in the first room
+    
+    var first_x =self.px+playerInfo.x;
+    var first_y =self.py+playerInfo.y;
+    
+    self.player = new Player(self,first_x, first_y);
+    self.player.id = playerInfo.playerId;
+    self.camera.startFollow(this.player.sprite);
+    //Watch the player and tilemap layers for collisions, for the duration of the scene:
+    this.physics.add.collider(self.player.sprite, this.groundLayer);
+    this.physics.add.collider(self.player.sprite, this.stuffLayer);
+  }
+  
+  addOtherPlayers(self, playerInfo) {
+    
+    //const otherPlayer = self.physics.add.image(self.px+playerInfo.x, self.py+playerInfo.y, 'other')
+    const otherPlayer = this.physics.add.sprite(self.px+playerInfo.x, self.py+playerInfo.y, "other");  
+    otherPlayer.playerId = playerInfo.playerId
+    otherPlayer.setTint(playerInfo.color)
+    self.otherPlayers.add(otherPlayer)
+    // Watch the player and tilemap layers for collisions, for the duration of the scene:
+    
+    //this.physics.add.collider(otherPlayer, this.groundLayer);
+    //this.physics.add.collider(otherPlayer, this.stuffLayer);
 
   }
 
   update() {
-      this.player.update();
+      if(this.player){
+        if(this.player.health < 0){
+          console.log("Dead!!");
+          
+          this.player.destroy();
+          //Switch to exit scene
+        }else{
+          this.player.update();
+        }
+         
+      
+      // send update to server
+      var x = this.player.sprite.x
+      var y = this.player.sprite.y
+      //console.log(" player: "+this.player.id+"  "+x+" , "+y);
+      if (this.player.oldPosition && (x !== this.player.oldPosition.x || y !== this.player.oldPosition.y )) {
+        
+        this.socket.emit('playerMovement', { x: this.player.sprite.x, y: this.player.sprite.y})
+      }
+  
+      this.player.oldPosition = {
+        x: this.player.sprite.x,
+        y: this.player.sprite.y
+      }
 
+      // visability control
       // Find the player's room using another helper method from the dungeon that converts from
       // dungeon XY (in grid units) to the corresponding room object
       const playerTileX = this.groundLayer.worldToTileX(this.player.sprite.x);
@@ -226,7 +382,13 @@ export default class DungeonScene extends Phaser.Scene {
       const playerRoom = this.dungeon.getRoomAt(playerTileX, playerTileY);
 
       this.tilemapVisibility.setActiveRoom(playerRoom);
+    }  
   }
 
+}//end of Dungeon class
 
-}
+      // SocketIO setup
+      
+      // based on https://gamedevacademy.org/create-a-basic-multiplayer-game-in-phaser-3-with-socket-io-part-2/
+      //and https://github.com/ivangfr/socketio-express-phaser3
+      // see also https://www.dynetisgames.com/2017/03/06/how-to-make-a-multiplayer-online-game-with-phaser-socket-io-and-node-js/

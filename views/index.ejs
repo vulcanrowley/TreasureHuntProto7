@@ -7,8 +7,10 @@
     <body>
 
         <script>
+            //uses ejs templating to build HTML with embedded random seed from server
+            // to make each client produce the same dungeon scene
             var sceneSeed = <%= SceneCode %>;
-            console.log("Scene Code from EJS",sceneSeed);
+            //console.log("Scene Code from EJS",sceneSeed);
         </script>
 
         
