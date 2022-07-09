@@ -23,9 +23,17 @@ export default class Player {
     });
 
     this.sprite = scene.physics.add.sprite(x, y, "characters", 0).setSize(22, 33).setOffset(23, 27);
-    //this.x = this.sprite.x;
-    //this.y = this.sprite.y;
+    this.x = this.sprite.x;
+    this.y = this.sprite.y;
     this.sprite.anims.play("player-walk-back");
+    
+    this.text = scene.add.text(x-10, y-30, this.health, {font: "16px Arial", fill: "#00ff00",background:"#00ff00"});
+    //var container = scene.add.container(x, y);
+    //let person = scene.add.container(x, y, [ this.sprite, this.text ]);
+    //container.add(this.sprite)
+    //container.add(this.text)
+    //container.setSize(64,64)
+
 
     this.keys = scene.input.keyboard.createCursorKeys();
   }
@@ -73,6 +81,8 @@ export default class Player {
       // If we were moving, pick and idle frame to use
       if (prevVelocity.y < 0) sprite.setTexture("characters", 65);
       else sprite.setTexture("characters", 46);
+
+
     }
   }
 

@@ -15,6 +15,7 @@ var config = {
   height: 600,
   active: false,
   seed: 5,
+  backgroundColor: '#ffffff',
   physics: {
     default: "arcade",
     arcade: {

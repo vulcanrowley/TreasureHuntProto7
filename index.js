@@ -37,7 +37,7 @@ server.listen(8000, function () {
 // Server Game code maintaining player's states and using socketIO to update clients
 /////////////////////////////////////////////////////////////////////////////////
 var players = {}// in memory player table
-
+var playerColors =['0xff0000','0x00ff00','0xcdcdcd','0x0000ff','0x6495ED' ,'0x3366ff','0x33ccff','0xE06F8B']
 // repeating timer to reduce all players health by 1 point every 1 second (final parameters 
 // to be set in playtesting)
 /*  DISABLED DURING DEVELOPMENT
@@ -76,13 +76,19 @@ setInterval(()=> {
 io.on('connection', function (socket) {
   console.log('player [' + socket.id + '] connected')
 
+  var playerColor ='0xffffff'
+  if(playerColors.length>0){
+    playerColor =playerColors.pop();
+  }
+ 
+  console.log("color is "+playerColor)
   players[socket.id] = {
     health: 100,
     hasTreasure: false,
     x: Math.floor(Math.random() * 150) -75,// initial x position
     y: Math.floor(Math.random() * 150) -75,// initial y position
     playerId: socket.id,
-    color: getRandomColor()// but not gold
+    color: playerColor//getPlayerColor()//getRandomColor()// but not gold
   }
   socket.emit('currentPlayers', players)
   socket.broadcast.emit('newPlayer', players[socket.id])
@@ -112,9 +118,9 @@ io.on('connection', function (socket) {
   // which slows down player speed
   socket.on('treasureHit', function (jug) {
     players[socket.id].hasTreasure = true;
-    
+    players[socket.id].color = "0xFFFF00";
     console.log(socket.id+ " found treasure ");
-    io.emit('treasureFound', jug) //socket.broadcast.emit
+    socket.broadcast.emit('treasureFound',{ jug:jug, player:socket.id} ) //socket.broadcast.emit
   })
 
     // When player touches player, reduce both players by random amount and tell all clients
@@ -128,24 +134,28 @@ io.on('connection', function (socket) {
   })
 
     // When player finds Exit and has treasure, transfer to winner/loser scene and end gane
-  socket.on('exitHit', function (jug) {
+  socket.on('exitHit', function () {
+    //console.log(" in server");
     if(players[socket.id].hasTreasure == true)
       {// declare winner in new screen and end game
+        console.log(socket.id+ " took the Treasure - has left the Game ");
+        // tell everybody else, game over
+        let reasonCode ='lost'
+        socket.broadcast.emit('gameOver',{reason:reasonCode})// means another player escaped with treasure
       };
     
-    console.log(socket.id+ " found exit ");
-    socket.broadcast.emit('gameOver', jug)
-  })
+    
+  })// end of exitHit
 
 
 
-})
+})// end of socketIO section
 
 function getRandomColor() {
-  // but not gold 0x0xfafad2; reserved for player carrying treasure
+  // but not gold 0xfafad2; reserved for player carrying treasure
 
   varColor = '0x' + Math.floor(Math.random() * 16777215).toString(16);
-  while(varColor == "0xfafad2"){
+  while(varColor == "0xFFFF00"){
       varColor = '0x' + Math.floor(Math.random() * 16777215).toString(16);
     }
   return varColor;
