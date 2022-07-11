@@ -35,6 +35,7 @@ export default class DungeonScene extends Phaser.Scene {
   preload() {
       this.load.image("tiles", "../assets/tilesets/buch-tileset-48px-extruded.png");
       this.load.image("other", "../assets/star_gold.png");
+      this.load.image("enemy", "../assets/enemyBlack5.png");
       this.load.spritesheet(
       "characters",
       "../assets/spritesheets/buch-characters-64px-extruded.png",
@@ -50,6 +51,7 @@ export default class DungeonScene extends Phaser.Scene {
 
   create() {
     var self = this;
+    this.socket = io();
       // Generate a random world based on sceneSeed with a few extra options:
       //  - Rooms should only have odd number dimensions so that they have a center tile.
       //  - Doors should be at least 2 tiles away from corners, so that we can place a corner tile on
@@ -207,6 +209,9 @@ export default class DungeonScene extends Phaser.Scene {
       //collision with Exit tile
       this.stuffLayer.setTileIndexCallback(TILES.EXIT, this.hitExit, this);
 
+
+
+
       /*
       this.stuffLayer.setTileIndexCallback([13], (tile) => {
           this.stuffLayer.setTileIndexCallback([13], null);
@@ -250,9 +255,12 @@ export default class DungeonScene extends Phaser.Scene {
     //SocketIO Setup
     // Drived From https://github.com/ivangfr/socketio-express-phaser3
 
-    var self = this;
-    this.socket = io();
-    this.otherPlayers = this.physics.add.group(); 
+      // collison with other player
+      this.otherPlayers = this.physics.add.group({defaultKey:'otherPlayer'//,
+      //bounceX: 1,
+      //bounceY: 1.
+    });
+     
 
       // this msg from server lists all current players including us
       // sent when we first join the game
@@ -323,7 +331,7 @@ export default class DungeonScene extends Phaser.Scene {
         Object.keys(players).forEach(function (id) {
           if (players[id].playerId === self.socket.id) {
             self.player.health =players[id].health;
-            //console.log(" player: "+self.player.id+" health is "+self.player.health)
+            console.log(" player: "+self.player.id+" health is "+self.player.health)
           }
         })
       })
@@ -372,6 +380,7 @@ export default class DungeonScene extends Phaser.Scene {
 
       //this.player.freeze();
       //this.player.destroy();
+      this.scene.destroy();
 
     }
   }
@@ -408,6 +417,27 @@ export default class DungeonScene extends Phaser.Scene {
     //Watch the player and tilemap layers for collisions, for the duration of the scene:
     this.physics.add.collider(self.player.sprite, this.groundLayer);
     this.physics.add.collider(self.player.sprite, this.stuffLayer);
+    let debounceX = 0
+    let debounceY = 0
+    this.physics.add.overlap(this.player.sprite, this.otherPlayers, (obj1, obj2) => {
+      let id =0;
+      if (debounceX != obj2.x && debounceY != obj2.y){
+        // get id of obj2
+        self.otherPlayers.getChildren().forEach(function (otherPlayer) {
+          if (otherPlayer.x == obj2.x && otherPlayer.y == obj2.y) {
+            id = otherPlayer.playerId;
+            //console.log(" otherplayer id: "+id)
+          }
+        });
+        
+        //console.log("ob1 id "+this.player.id+" , ob2 id "+id)
+        debounceX = obj2.x
+        debounceY = obj2.y
+        this.socket.emit('combatHit', { "attacker": this.player.id, "target": id})
+      } 
+
+    });
+
   }
   
   addOtherPlayers(self, playerInfo) {
@@ -417,6 +447,7 @@ export default class DungeonScene extends Phaser.Scene {
     otherPlayer.playerId = playerInfo.playerId
     otherPlayer.setTint(playerInfo.color)
     self.otherPlayers.add(otherPlayer)
+
 
   }
 
@@ -439,10 +470,12 @@ export default class DungeonScene extends Phaser.Scene {
       if (this.player.oldPosition && (x !== this.player.oldPosition.x || y !== this.player.oldPosition.y )) {
         // move player health value with player
         //console.log(" text"+this.player.text.x)
-        this.player.text.x = x -10
-        this.player.text.y = y -30
-        this.player.text.setTintFill(0x00ff00)
-        if(this.player.health < 30){this.player.text.setTintFill(0xff0000);}
+        //this.player.text = this.player.health;
+        this.player.Htext.text =this.player.health;
+        this.player.Htext.x = x -10
+        this.player.Htext.y = y -30
+        this.player.Htext.setTintFill(0x00ff00)
+        if(this.player.health < 30){this.player.Htext.setTintFill(0xff0000);}
         // tell server where we moved to
         this.socket.emit('playerMovement', { x: this.player.sprite.x, y: this.player.sprite.y})
       }

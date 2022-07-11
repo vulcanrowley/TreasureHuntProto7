@@ -27,13 +27,7 @@ export default class Player {
     this.y = this.sprite.y;
     this.sprite.anims.play("player-walk-back");
     
-    this.text = scene.add.text(x-10, y-30, this.health, {font: "16px Arial", fill: "#00ff00",background:"#00ff00"});
-    //var container = scene.add.container(x, y);
-    //let person = scene.add.container(x, y, [ this.sprite, this.text ]);
-    //container.add(this.sprite)
-    //container.add(this.text)
-    //container.setSize(64,64)
-
+    this.Htext = scene.add.text(x-10, y-30, this.health, {font: "16px Arial", fill: "#00ff00",background:"#00ff00"});
 
     this.keys = scene.input.keyboard.createCursorKeys();
   }

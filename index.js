@@ -124,13 +124,15 @@ io.on('connection', function (socket) {
   })
 
     // When player touches player, reduce both players by random amount and tell all clients
-  socket.on('combatHit', function (jug) {
+  socket.on('combatHit', function (fighters) {
     // debounce so only initial contact matters
     // reduce health in both players by random amount in range 0-2
-    //Math.floor(Math.random() * 3)
-    
-    console.log(socket.id+ " COMBAT!! ");
-    io.emit('healthUpdate', players)//socket.broadcast.emit
+    //console.log(" attacker "+fighters.attacker+" target "+fighters.target)
+    players[fighters.attacker].health -= Math.floor(Math.random() * 3)
+    players[fighters.target].health -= Math.floor(Math.random() * 3)
+    //console.log(" attacker H"+players[fighters.attacker].health+" target "+players[fighters.target].health)
+    //console.log( " COMBAT!! ");
+    io.emit('healthUpdate', players)//socket.broadcast.emit wouldn't update player sending msg
   })
 
     // When player finds Exit and has treasure, transfer to winner/loser scene and end gane
