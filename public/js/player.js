@@ -3,7 +3,9 @@ export default class Player {
     this.scene = scene;
     this.id = null;
     this.hasTreasure =false;
-    this.health =100;
+    this.playerKilled =false;
+    this.playerStarved= false;
+    this.health =10;
     this.x = x;
     this.y = y;
     this.speed = 300;

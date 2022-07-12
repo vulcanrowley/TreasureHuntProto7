@@ -50,7 +50,7 @@ export default class LostScene extends Phaser.Scene {
         //this.player.freeze();
         const cam = this.cameras.main;
         cam.fade(250, 0, 0, 0);
-        cam.fadeOut(10000,0xff0000)
+        cam.fadeOut(15000,0xff0000)
         cam.once("camerafadeoutcomplete", () => {
             
             this.scene.remove();

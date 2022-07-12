@@ -331,16 +331,33 @@ export default class DungeonScene extends Phaser.Scene {
         Object.keys(players).forEach(function (id) {
           if (players[id].playerId === self.socket.id) {
             self.player.health =players[id].health;
+            //self.player.sprite.setTint(players[id].color)
+            if(players[id].playerKilled){
+              //console.log(id+" killed")
+              self.changeScene('combat')
+            }
+            if(players[id].playerStarved){
+              self.changeScene('starved')
+            }
             console.log(" player: "+self.player.id+" health is "+self.player.health)
-          }
+          } else {
+            self.otherPlayers.getChildren().forEach(function (otherPlayer) {
+              if(otherPlayer.playerId === players[id].playerId){
+                otherPlayer.setTint(players[id].color)
+              }// end of if
+            })// end of iter
+          }// end else - sets color of other player
+
         })
       })
 
   }// end of create function
 
  changeScene(reason){
+  //console.log("got to change scene") 
   this.scene.add('LostScene', LostScene);
   this.scene.start('LostScene',{reason: reason})
+  this.endPlayer();
  }
 
  changeWinScene(){
@@ -349,10 +366,11 @@ export default class DungeonScene extends Phaser.Scene {
  }
 
  endPlayer(){
-  this.player.freeze();
-  this.player.destroy();
-  
-  //this.socket.emit('endConnect')
+  //this.player.freeze();
+  //this.player.destroy();
+  //this.socket.end();
+  this.scene.destroy();
+
  }
 
  hitJug (sprite, tile)
@@ -393,7 +411,7 @@ export default class DungeonScene extends Phaser.Scene {
     this.player.sprite.setTint(0xfafad2);
     this.player.hasTreasure= true; 
     this.player.speed = 150; 
-    //console.log("hit jug at"+tile.x+" , "+tile.y)
+    
   }
 
   // needed this function to wrap this.stuff.remove... - not sure why
@@ -421,16 +439,17 @@ export default class DungeonScene extends Phaser.Scene {
     let debounceY = 0
     this.physics.add.overlap(this.player.sprite, this.otherPlayers, (obj1, obj2) => {
       let id =0;
-      if (debounceX != obj2.x && debounceY != obj2.y){
+      if (debounceX != obj2.x || debounceY != obj2.y){
         // get id of obj2
+        // search otherplayer for the same x.y as the target, to get its Id
         self.otherPlayers.getChildren().forEach(function (otherPlayer) {
           if (otherPlayer.x == obj2.x && otherPlayer.y == obj2.y) {
             id = otherPlayer.playerId;
-            //console.log(" otherplayer id: "+id)
+            
           }
         });
         
-        //console.log("ob1 id "+this.player.id+" , ob2 id "+id)
+      
         debounceX = obj2.x
         debounceY = obj2.y
         this.socket.emit('combatHit', { "attacker": this.player.id, "target": id})

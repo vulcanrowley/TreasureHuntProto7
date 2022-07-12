@@ -38,6 +38,7 @@ server.listen(8000, function () {
 /////////////////////////////////////////////////////////////////////////////////
 var players = {}// in memory player table
 var playerColors =['0xff0000','0x00ff00','0xcdcdcd','0x0000ff','0x6495ED' ,'0x3366ff','0x33ccff','0xE06F8B']
+
 // repeating timer to reduce all players health by 1 point every 1 second (final parameters 
 // to be set in playtesting)
 /*  DISABLED DURING DEVELOPMENT
@@ -46,10 +47,10 @@ setInterval(()=> {
     Object.keys(players).forEach( function (id) {
       players[id].health -= 1;
     if(players[id].health< 0){
-      
+      players[id].playerStarved = true;
       // tell every client that a player is dead
-      io.emit('playerDisconnected', players[id].playerId);
-      delete players[players[id]];
+      //io.emit('playerDisconnected', players[id].playerId);
+      //delete players[players[id]];
       console.log('player [' + players[id].playerId + '] disconnected')
     }
   });
@@ -83,7 +84,9 @@ io.on('connection', function (socket) {
  
   console.log("color is "+playerColor)
   players[socket.id] = {
-    health: 100,
+    health: 10,
+    playerKilled: false,
+    playerStarved: false,
     hasTreasure: false,
     x: Math.floor(Math.random() * 150) -75,// initial x position
     y: Math.floor(Math.random() * 150) -75,// initial y position
@@ -125,11 +128,40 @@ io.on('connection', function (socket) {
 
     // When player touches player, reduce both players by random amount and tell all clients
   socket.on('combatHit', function (fighters) {
-    // debounce so only initial contact matters
+   
     // reduce health in both players by random amount in range 0-2
     //console.log(" attacker "+fighters.attacker+" target "+fighters.target)
-    players[fighters.attacker].health -= Math.floor(Math.random() * 3)
-    players[fighters.target].health -= Math.floor(Math.random() * 3)
+    players[fighters.attacker].health -= Math.floor(Math.random() * 5)
+    console.log("attacker now "+players[fighters.attacker].health)
+    if(players[fighters.attacker].health<0){
+      players[fighters.attacker].playerKilled=true;
+      players[fighters.attacker].color = "0x000000"
+      // test if carrying treasure
+      if(players[fighters.attacker].hasTreasure){
+        // give treasure other player
+        //console.log(fighters.attacker+" killed and has treasure")
+        players[fighters.attacker].hasTreasure= false
+        players[fighters.target].hasTreasure = true
+        players[fighters.target].color = "0xfafad2"
+        
+      }// end Treasure check
+    }// end attacker check
+    
+    players[fighters.target].health -= Math.floor(Math.random() * 5)
+    console.log("target now "+players[fighters.target].health)
+    if(players[fighters.target].health<0){
+      players[fighters.target].playerKilled=true;
+      players[fighters.target].color = "0x000000"
+
+      if(players[fighters.target].hasTreasure){
+        // give treasure other player
+        console.log(fighters.target+" killed and had treasure")
+        players[fighters.target].hasTreasure= false
+        players[fighters.attacker].hasTreasure = true
+        players[fighters.attacker].color = "0xfafad2"
+        
+      }
+    }
     //console.log(" attacker H"+players[fighters.attacker].health+" target "+players[fighters.target].health)
     //console.log( " COMBAT!! ");
     io.emit('healthUpdate', players)//socket.broadcast.emit wouldn't update player sending msg
