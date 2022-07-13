@@ -22,7 +22,7 @@ export default class LostScene extends Phaser.Scene {
     }
 
     create(){
-        //console.log(" lost because "+this.reasonCode)
+        console.log(" lost because "+this.reasonCode)
 
         let text1 = this.add.text(400, 300, "Sorry- You Lost ", { font: '64px Arial',fill: '#000000' });
         //text1.setTint(0x000000);
