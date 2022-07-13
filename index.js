@@ -30,6 +30,7 @@ app.get('/', (req, res) => {
   res.render('index', { SceneCode: verificationCode});
 });
 
+server.maxConnections(10);
 server.listen(port, () => console.log(`Treasure Hunt listening on port ${port}!`));
 //server.listen(8000, function () {
   //console.log(`Listening on ${server.address().port}`);
