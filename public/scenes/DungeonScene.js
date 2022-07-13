@@ -370,8 +370,7 @@ export default class DungeonScene extends Phaser.Scene {
  endPlayer(){
   this.player.freeze();
   this.player.destroy();
-  this.socket.end();
-  //this.socket.emit('disconnect')
+  this.socket.disconnect(true)
   this.scene.destroy();
 
  }
