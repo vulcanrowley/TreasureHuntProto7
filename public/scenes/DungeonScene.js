@@ -357,7 +357,7 @@ export default class DungeonScene extends Phaser.Scene {
   }// end of create function
 
  changeScene(reason){
-  console.log("lost because"+reason) 
+  console.log("lost because "+reason) 
   
   this.scene.start('LostScene',{reason: reason})
   this.endPlayer();
@@ -392,11 +392,15 @@ export default class DungeonScene extends Phaser.Scene {
       this.stuffLayer.removeTileAt(tile.x-1,tile.y,false,false,this.stuffLayer);
       this.stuffLayer.removeTileAt(tile.x+1,tile.y,false,false,this.stuffLayer);
     
+   
+
+      //this.changeWinScene()
+      this.scene.start('WinnerScene')
+      this.socket.disconnect(true)
+      this.scene.destroy();
+
       //tell everybody game over
       this.socket.emit('exitHit')
-
-      this.changeWinScene()
-      //this.scene.start('WinnerScene')
 
 
     }
