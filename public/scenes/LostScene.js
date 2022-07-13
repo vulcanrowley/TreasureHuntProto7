@@ -54,7 +54,7 @@ export default class LostScene extends Phaser.Scene {
         cam.once("camerafadeoutcomplete", () => {
             
             this.scene.remove();
-            this.sys.game.destroy(true);
+            //this.sys.game.destroy(true);
         });
 
     }

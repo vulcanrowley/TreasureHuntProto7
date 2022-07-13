@@ -42,7 +42,7 @@ server.listen(port, () => console.log(`Treasure Hunt listening on port ${port}!`
 /////////////////////////////////////////////////////////////////////////////////
 
 var playerColors =['0xff0000','0x00ff00','0xcdcdcd','0x0000ff','0x6495ED' ,'0x3366ff','0x33ccff','0xE06F8B']
-
+var playerCnt = 0;
 // repeating timer to reduce all players health by 1 point every 1 second (final parameters 
 // to be set in playtesting)
 //  DISABLED DURING DEVELOPMENT
@@ -79,26 +79,36 @@ setInterval(()=> {
 // --- "exitHit" ends game if player hasTreasure is true
 
 io.on('connection', function (socket) {
-  console.log('player [' + socket.id + '] connected')
+  playerCnt += 1;
+  if (playerCnt <9){
+    console.log('player [' + socket.id + '] connected')
 
-  var playerColor ='0xffffff'
-  if(playerColors.length>0){
-    playerColor =playerColors.pop();
+    var playerColor ='0xffffff'
+    if(playerColors.length>0){
+      playerColor =playerColors.pop();
+    }
+   
+    console.log("color is "+playerColor)
+    players[socket.id] = {
+      health: 100,
+      playerKilled: false,
+      playerStarved: false,
+      hasTreasure: false,
+      x: Math.floor(Math.random() * 150) -75,// initial x position
+      y: Math.floor(Math.random() * 150) -75,// initial y position
+      playerId: socket.id,
+      color: playerColor//getPlayerColor()//getRandomColor()// but not gold
+    }
+    socket.emit('currentPlayers', players)
+    socket.broadcast.emit('newPlayer', players[socket.id])
+
+  }else{
+    // over max connection - 8 
+    this.socket.disconnect(true);
+    console.log("No player slot available")
   }
- 
-  console.log("color is "+playerColor)
-  players[socket.id] = {
-    health: 100,
-    playerKilled: false,
-    playerStarved: false,
-    hasTreasure: false,
-    x: Math.floor(Math.random() * 150) -75,// initial x position
-    y: Math.floor(Math.random() * 150) -75,// initial y position
-    playerId: socket.id,
-    color: playerColor//getPlayerColor()//getRandomColor()// but not gold
-  }
-  socket.emit('currentPlayers', players)
-  socket.broadcast.emit('newPlayer', players[socket.id])
+
+
  
   socket.on('disconnect', function () {
     console.log('player [' + socket.id + '] disconnected')

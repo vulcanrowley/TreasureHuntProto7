@@ -343,6 +343,7 @@ export default class DungeonScene extends Phaser.Scene {
             }
             console.log(" player: "+self.player.id+" health is "+self.player.health)
           } else {
+            // while we're here, set everybody color
             self.otherPlayers.getChildren().forEach(function (otherPlayer) {
               if(otherPlayer.playerId === players[id].playerId){
                 otherPlayer.setTint(players[id].color)
