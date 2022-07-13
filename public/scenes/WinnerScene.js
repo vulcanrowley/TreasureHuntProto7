@@ -29,6 +29,7 @@ export default class WinnerScene extends Phaser.Scene {
 
     claimReward(){
         console.log(" jump to NFT mint website")
+        this.scene.remove();
     }
 
 

@@ -392,19 +392,12 @@ export default class DungeonScene extends Phaser.Scene {
       this.stuffLayer.removeTileAt(tile.x-1,tile.y,false,false,this.stuffLayer);
       this.stuffLayer.removeTileAt(tile.x+1,tile.y,false,false,this.stuffLayer);
     
-      //this.scene.add('LostScene', LostScene);
-      //this.scene.start('LostScene',{reason: 'combat'})
-
-      
-      this.scene.start('WinnerScene')
-
       //tell everybody game over
       this.socket.emit('exitHit')
 
-      //this.player.freeze();
-      //this.player.destroy();
-      //this.socket.emit('disconnect')
-      this.scene.destroy();
+      this.changeWinScene()
+      //this.scene.start('WinnerScene')
+
 
     }
   }
