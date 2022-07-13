@@ -40,7 +40,7 @@ server.listen(port, () => console.log(`Treasure Hunt listening on port ${port}!`
 
 // Server Game code maintaining player's states and using socketIO to update clients
 /////////////////////////////////////////////////////////////////////////////////
-var players = {}// in memory player table
+
 var playerColors =['0xff0000','0x00ff00','0xcdcdcd','0x0000ff','0x6495ED' ,'0x3366ff','0x33ccff','0xE06F8B']
 
 // repeating timer to reduce all players health by 1 point every 1 second (final parameters 

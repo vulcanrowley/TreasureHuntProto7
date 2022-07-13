@@ -234,7 +234,8 @@ export default class DungeonScene extends Phaser.Scene {
       */
 
       ////// END of DUNGEON GENERATION
-
+      this.scene.add('WinnerScene', WinnerScene);
+      this.scene.add('LostScene', LostScene);
 
       // Phaser supports multiple cameras, but you can access the default camera like this:
       this.camera = this.cameras.main;
@@ -356,7 +357,7 @@ export default class DungeonScene extends Phaser.Scene {
 
  changeScene(reason){
   //console.log("got to change scene") 
-  this.scene.add('LostScene', LostScene);
+  
   this.scene.start('LostScene',{reason: reason})
   this.endPlayer();
  }
@@ -367,9 +368,9 @@ export default class DungeonScene extends Phaser.Scene {
  }
 
  endPlayer(){
-  //this.player.freeze();
-  //this.player.destroy();
-  //this.socket.end();
+  this.player.freeze();
+  this.player.destroy();
+  this.socket.end();
   //this.socket.emit('disconnect')
   this.scene.destroy();
 
@@ -393,7 +394,7 @@ export default class DungeonScene extends Phaser.Scene {
       //this.scene.add('LostScene', LostScene);
       //this.scene.start('LostScene',{reason: 'combat'})
 
-      this.scene.add('WinnerScene', WinnerScene);
+      
       this.scene.start('WinnerScene')
 
       //tell everybody game over
