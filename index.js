@@ -81,7 +81,7 @@ setInterval(()=> {
 io.on('connection', function (socket) {
   playerCnt += 1;
   if (playerCnt <9){
-    console.log('player [' + socket.id + '] connected')
+    console.log('player # '+playerCnt+' [' + socket.id + '] connected')
 
     var playerColor ='0xffffff'
     if(playerColors.length>0){
