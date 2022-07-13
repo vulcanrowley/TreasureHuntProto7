@@ -14,3 +14,8 @@ Dungeon generation clbased on Mike West Dungeon see https://github.com/mikewesth
 DevLog:7/9/22
 Most of localhost version running except combat and health decay disabled during dev
 
+All functions operational
+
+App is deployed on Render.com as RowleyCryptoGames.com
+
+

@@ -1,6 +1,7 @@
 import Player from "/js/player.js";
 import LostScene from "/scenes/LostScene.js";
 import WinnerScene from "/scenes/WinnerScene.js";
+import LobbyScene from "/scenes/LobbyScene.js";
 import TILES from "/js/tile-mapping.js";
 import TilemapVisibility from "/js/tilemap-visibility.js";
 //import {Scene} from 'phaser'
@@ -369,6 +370,7 @@ export default class DungeonScene extends Phaser.Scene {
   //this.player.freeze();
   //this.player.destroy();
   //this.socket.end();
+  this.socket.emit('disconnect')
   this.scene.destroy();
 
  }
@@ -398,6 +400,7 @@ export default class DungeonScene extends Phaser.Scene {
 
       //this.player.freeze();
       //this.player.destroy();
+      this.socket.emit('disconnect')
       this.scene.destroy();
 
     }

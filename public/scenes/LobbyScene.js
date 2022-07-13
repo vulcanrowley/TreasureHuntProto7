@@ -1,12 +1,12 @@
-export default class Init extends Phaser.Scene {
+export default class LobbyScene extends Phaser.Scene {
     constructor() {
-        super({ key: 'Init' })
+        super({ key: 'Lobby' })
       
     }
     
     init (data)// used to transfer data into scene from scene.start
     {
-        console.log('seed in Init ', data.seed);
+        console.log('seed in Lobby ', data.seed);
 
 
     }
@@ -19,6 +19,8 @@ export default class Init extends Phaser.Scene {
     
 
     create(){
-        this.socket = io();
+        // Player's sign in to Lobby by connecting a Solana wallet
+        // and player indicates when ready.
+        // When sufficient players a ready, Dungeon Scene is loaded and we're off
     }
 }

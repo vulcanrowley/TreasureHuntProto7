@@ -2,6 +2,7 @@
 var express = require('express');
 const crypto = require("crypto");
 const path = require('path');
+const port = process.env.PORT || 8000;
 
 var app = express();
 var server = require('http').Server(app);
@@ -29,10 +30,10 @@ app.get('/', (req, res) => {
   res.render('index', { SceneCode: verificationCode});
 });
 
-
-server.listen(8000, function () {
-  console.log(`Listening on ${server.address().port}`);
-});
+server.listen(port, () => console.log(`Treasure Hunt listening on port ${port}!`));
+//server.listen(8000, function () {
+  //console.log(`Listening on ${server.address().port}`);
+//});
 
 // Server Game code maintaining player's states and using socketIO to update clients
 /////////////////////////////////////////////////////////////////////////////////
@@ -41,7 +42,7 @@ var playerColors =['0xff0000','0x00ff00','0xcdcdcd','0x0000ff','0x6495ED' ,'0x33
 
 // repeating timer to reduce all players health by 1 point every 1 second (final parameters 
 // to be set in playtesting)
-/*  DISABLED DURING DEVELOPMENT
+//  DISABLED DURING DEVELOPMENT
 setInterval(()=> {
   if(players){
     Object.keys(players).forEach( function (id) {
@@ -51,14 +52,14 @@ setInterval(()=> {
       // tell every client that a player is dead
       //io.emit('playerDisconnected', players[id].playerId);
       //delete players[players[id]];
-      console.log('player [' + players[id].playerId + '] disconnected')
+      //console.log('player [' + players[id].playerId + '] disconnected')
     }
   });
   // send msg to reduce health for all clients
   io.emit('healthUpdate',players);
  }
 },1000)// reduce health for all players once per second
-*/
+
 
 
 // creates player when client connects
@@ -84,7 +85,7 @@ io.on('connection', function (socket) {
  
   console.log("color is "+playerColor)
   players[socket.id] = {
-    health: 10,
+    health: 100,
     playerKilled: false,
     playerStarved: false,
     hasTreasure: false,
@@ -132,7 +133,7 @@ io.on('connection', function (socket) {
     // reduce health in both players by random amount in range 0-2
     //console.log(" attacker "+fighters.attacker+" target "+fighters.target)
     players[fighters.attacker].health -= Math.floor(Math.random() * 5)
-    console.log("attacker now "+players[fighters.attacker].health)
+    
     if(players[fighters.attacker].health<0){
       players[fighters.attacker].playerKilled=true;
       players[fighters.attacker].color = "0x000000"
@@ -148,7 +149,7 @@ io.on('connection', function (socket) {
     }// end attacker check
     
     players[fighters.target].health -= Math.floor(Math.random() * 5)
-    console.log("target now "+players[fighters.target].health)
+    
     if(players[fighters.target].health<0){
       players[fighters.target].playerKilled=true;
       players[fighters.target].color = "0x000000"
@@ -162,8 +163,10 @@ io.on('connection', function (socket) {
         
       }
     }
-    //console.log(" attacker H"+players[fighters.attacker].health+" target "+players[fighters.target].health)
-    //console.log( " COMBAT!! ");
+    //edge conditions
+    //  - when both layer die in same combat collision
+    //  -- drop treasure at spot? or back at original spot??
+    //  - has does melee work?
     io.emit('healthUpdate', players)//socket.broadcast.emit wouldn't update player sending msg
   })
 
