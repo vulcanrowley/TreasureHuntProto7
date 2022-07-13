@@ -357,15 +357,16 @@ export default class DungeonScene extends Phaser.Scene {
   }// end of create function
 
  changeScene(reason){
-  //console.log("got to change scene") 
+  console.log("lost because"+reason) 
   
   this.scene.start('LostScene',{reason: reason})
   this.endPlayer();
  }
 
  changeWinScene(){
-  this.scene.add('WinScene', WinScene);
+  
   this.scene.start('WinScene')
+  this.endPlayer();
  }
 
  endPlayer(){
