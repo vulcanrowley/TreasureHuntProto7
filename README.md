@@ -16,6 +16,6 @@ Most of localhost version running except combat and health decay disabled during
 
 All functions operational
 
-App is deployed on Render.com as RowleyCryptoGames.com
+App is deployed on Render.com as RowleyCryptoGames.com or https://treasurehuntproto.onrender.com/
 
 

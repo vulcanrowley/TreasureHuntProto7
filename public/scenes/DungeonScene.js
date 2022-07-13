@@ -370,7 +370,7 @@ export default class DungeonScene extends Phaser.Scene {
   //this.player.freeze();
   //this.player.destroy();
   //this.socket.end();
-  this.socket.emit('disconnect')
+  //this.socket.emit('disconnect')
   this.scene.destroy();
 
  }
@@ -396,11 +396,12 @@ export default class DungeonScene extends Phaser.Scene {
       this.scene.add('WinnerScene', WinnerScene);
       this.scene.start('WinnerScene')
 
+      //tell everybody game over
       this.socket.emit('exitHit')
 
       //this.player.freeze();
       //this.player.destroy();
-      this.socket.emit('disconnect')
+      //this.socket.emit('disconnect')
       this.scene.destroy();
 
     }
@@ -413,7 +414,7 @@ export default class DungeonScene extends Phaser.Scene {
     
     this.player.sprite.setTint(0xfafad2);
     this.player.hasTreasure= true; 
-    this.player.speed = 150; 
+    this.player.speed = 270; 
     
   }
 
