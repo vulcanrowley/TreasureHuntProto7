@@ -143,7 +143,7 @@ io.on('connection', function (socket) {
     // When player touches player, reduce both players by random amount and tell all clients
   socket.on('combatHit', function (fighters) {
    
-    // reduce health in both players by random amount in range 0-2
+    // reduce health in both players by random amount in range 0-4
     //console.log(" attacker "+fighters.attacker+" target "+fighters.target)
     players[fighters.attacker].health -= Math.floor(Math.random() * 5)
     

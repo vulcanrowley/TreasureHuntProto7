@@ -440,23 +440,25 @@ export default class DungeonScene extends Phaser.Scene {
     //Watch the player and tilemap layers for collisions, for the duration of the scene:
     this.physics.add.collider(self.player.sprite, this.groundLayer);
     this.physics.add.collider(self.player.sprite, this.stuffLayer);
+
+    // combat collison handler
     let debounceX = 0
     let debounceY = 0
     this.physics.add.overlap(this.player.sprite, this.otherPlayers, (obj1, obj2) => {
       let id =0;
       if (debounceX != obj2.x || debounceY != obj2.y){
-        // get id of obj2
-        // search otherplayer for the same x.y as the target, to get its Id
+        // get id of obj2(target)
+        // search otherplayer for the same x,y as the target, to get its Id
         self.otherPlayers.getChildren().forEach(function (otherPlayer) {
           if (otherPlayer.x == obj2.x && otherPlayer.y == obj2.y) {
             id = otherPlayer.playerId;
             
           }
         });
-        
       
         debounceX = obj2.x
         debounceY = obj2.y
+        // tell server we hit target
         this.socket.emit('combatHit', { "attacker": this.player.id, "target": id})
       } 
 
