@@ -104,7 +104,10 @@ io.on('connection', function (socket) {
 
   }else{
     // over max connection - 8 
-    this.socket.disconnect(true);
+    //console.log("socket Id \n"+io.sockets.connected[socket.id])
+    //io.sockets.connected[socket.id].disconnect(true);
+    
+    socket.disconnect(true);
     console.log("No player slot available")
   }
 

@@ -373,24 +373,19 @@ export default class DungeonScene extends Phaser.Scene {
   }// end of create function
 
  moveTreasure(){
-   console.log("in moveTreasure")
-
   this.socket.emit('resetTreasure')
  } 
  placeTreasure(){
-  console.log("in placeTreasure")
+  
  this.stuffLayer.putTileAt(TILES.CHEST, this.goalRoom.centerX, this.goalRoom.centerY);
 } 
 
- changeScene(reason){
-  console.log("lost because "+reason) 
-  
+ changeScene(reason){ 
   this.scene.start('LostScene',{reason: reason})
   this.endPlayer();
  }
 
  changeWinScene(){
-  
   this.scene.start('WinScene')
   this.endPlayer();
  }
