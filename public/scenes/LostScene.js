@@ -22,24 +22,26 @@ export default class LostScene extends Phaser.Scene {
     }
 
     create(){
-        console.log("in Lost Scene: lost because "+this.reasonCode)
-
+        
+        
         let text1 = this.add.text(400, 300, "Sorry- You Lost ", { font: '64px Arial',fill: '#000000' });
         //text1.setTint(0x000000);
         text1.setOrigin(.5);
 
+        if(this.reasonCode == 'starved'){
+            let text3 = this.add.text(400,400, "You starved!", { font: '32px Arial',fill: '#000000' });
+            
+            text3.setOrigin(.5);
+            
+
+        }
         if(this.reasonCode == 'lost'){
             let text2 = this.add.text(400,400, "Another player escaped with Treasure", { font: '32px Arial',fill: '#000000' });
             
             text2.setOrigin(.5);
 
         }
-        if(this.reasonCode == 'starved'){
-            let text3 = this.add.text(400,400, "You starved!", { font: '32px Arial',fill: '#ffffff' });
-            
-            text3.setOrigin(.5);
 
-        }
         if(this.reasonCode == 'combat'){
             let text4 = this.add.text(400,400, "You were killed by another player", { font: '32px Arial',fill: '#ff0000' });
             

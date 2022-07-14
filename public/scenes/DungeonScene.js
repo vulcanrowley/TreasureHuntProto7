@@ -129,7 +129,7 @@ export default class DungeonScene extends Phaser.Scene {
       const rooms = this.dungeon.rooms.slice();
       // segregate special rooms
       const startRoom = rooms.shift();
-      const goalRoom =Phaser.Utils.Array.RemoveAt(rooms,rooms.length-1);
+      this.goalRoom =Phaser.Utils.Array.RemoveAt(rooms,rooms.length-1);
       //const goalRoom = Phaser.Utils.Array.RemoveRandomElement(rooms);
       const endRoom1 =Phaser.Utils.Array.RemoveAt(rooms,rooms.length-1);
       //const endRoom1 = Phaser.Utils.Array.RemoveRandomElement(rooms);
@@ -139,8 +139,9 @@ export default class DungeonScene extends Phaser.Scene {
       const otherRooms = Phaser.Utils.Array.Shuffle(rooms).slice(0, rooms.length * 0.98);
       this.px = map.tileToWorldX(startRoom.centerX);
       this.py = map.tileToWorldY(startRoom.centerY);
+
       // Place the Treasure
-      this.stuffLayer.putTileAt(TILES.CHEST, goalRoom.centerX, goalRoom.centerY);
+      this.stuffLayer.putTileAt(TILES.CHEST, this.goalRoom.centerX, this.goalRoom.centerY);
 
       // Place the Exits
       this.stuffLayer.putTilesAt([152,153], endRoom1.centerX, endRoom1.centerY);
@@ -329,6 +330,15 @@ export default class DungeonScene extends Phaser.Scene {
         
       })
 
+      // server says someone died while carring the Treasure, so replace itat original spot
+      this.socket.on('replaceTreasure', function (players) {
+        Object.keys(players).forEach(function (id) {
+          if (players[id].playerId === self.socket.id) {
+            self.placeTreasure();
+          }
+         })
+        })    
+
       this.socket.on('healthUpdate', function (players) {
         Object.keys(players).forEach(function (id) {
           if (players[id].playerId === self.socket.id) {
@@ -339,6 +349,12 @@ export default class DungeonScene extends Phaser.Scene {
               self.changeScene('combat')
             }
             if(players[id].playerStarved){
+              //if player has treasure, return it to original spot and tell all otherPlayers
+              //possibe hack path
+              if(players[id].hasTreasure){
+                // Tell server to move Treasure
+                self.moveTreasure();
+              }
               self.changeScene('starved')
             }
             console.log(" player: "+self.player.id+" health is "+self.player.health)
@@ -355,6 +371,16 @@ export default class DungeonScene extends Phaser.Scene {
       })
 
   }// end of create function
+
+ moveTreasure(){
+   console.log("in moveTreasure")
+
+  this.socket.emit('resetTreasure')
+ } 
+ placeTreasure(){
+  console.log("in placeTreasure")
+ this.stuffLayer.putTileAt(TILES.CHEST, this.goalRoom.centerX, this.goalRoom.centerY);
+} 
 
  changeScene(reason){
   console.log("lost because "+reason) 

@@ -123,6 +123,11 @@ io.on('connection', function (socket) {
     socket.broadcast.emit('playerMoved', players[socket.id])
   })
 
+  // a player died while carrying the Treasure - tell everyone to reset location to original spot
+  socket.on('resetTreasure', function () {
+    socket.broadcast.emit('replaceTreasure', players)
+  })
+
   // When player encounters a jug, increase health on server and tell all clients that jug is gone
   socket.on('jugHit', function (jug) {
     players[socket.id].health += 10;
