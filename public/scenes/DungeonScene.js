@@ -398,7 +398,8 @@ export default class DungeonScene extends Phaser.Scene {
       this.scene.start('WinnerScene')
       this.socket.disconnect(true)
      // this.scene.destroy();
-      this.scene.remove();
+      this.scene.remove(DungeonScene);
+      
 
       //tell everybody game over
       this.socket.emit('exitHit')
