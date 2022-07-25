@@ -18,4 +18,6 @@ All functions operational
 
 App is deployed on Render.com as RowleyCryptoGames.com or https://treasurehuntproto.onrender.com/
 
+added Lobby function
+
 

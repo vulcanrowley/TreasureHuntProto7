@@ -1,4 +1,8 @@
-// index.js
+/////////////////////////////////////////////////////////////
+// index.js is the top level game server
+// when a client connects, creates player and Socket connection and sends client
+// to the game HTML page which loads the game - game.js - which loads the first scene
+////////////////////////////////////////////////// 
 var express = require('express');
 const crypto = require("crypto");
 const path = require('path');
