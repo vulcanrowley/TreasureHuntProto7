@@ -21,18 +21,19 @@ const verificationCode = n.toString().padStart(6, "0");
 
 app.use(express.json());
 app.use(express.static(__dirname + '/public'));
-app.set('view engine', 'ejs');
+//app.set('view engine', 'ejs');
 
-var players = {};  // in-memory database of players
-//app.get('/', function (req, res) {
-//  res.sendFile(__dirname + '/index.html');
-//});
+//var players = {};  // in-memory database of players
+
+app.get('/', function (req, res) {
+  res.sendFile(__dirname + '/index.html');
+});
 
 // using render instead of sendFile to enable server set random seed for all clients
 // which enbles the Dungeon generator to build the same scene for every user
-app.get('/', (req, res) => {
-  res.render('index', { SceneCode: verificationCode});
-});
+//app.get('/', (req, res) => {
+//  res.render('index', { SceneCode: verificationCode});
+//});
 
 
 

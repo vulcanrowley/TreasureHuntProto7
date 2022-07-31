@@ -18,6 +18,6 @@ All functions operational
 
 App is deployed on Render.com as RowleyCryptoGames.com or https://treasurehuntproto.onrender.com/
 
-added Lobby function
+added Lobby function based on "https://github.com/isaacjohnsononline/phaser-game-lobby"
 
 
