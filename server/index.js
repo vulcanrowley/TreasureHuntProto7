@@ -1,3 +1,6 @@
+/*
+<<<< code from Lobby for socket handling
+*/
 // node module includes
 var uuid = require('node-uuid');
 
@@ -164,4 +167,7 @@ server.on('connection', function (client) {
         return null;
     }
 });
+////////////////////////////////////////////////////
+// end of Lobby code
+/////////////////////////////////////////
 

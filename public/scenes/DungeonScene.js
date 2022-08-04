@@ -235,6 +235,7 @@ export default class DungeonScene extends Phaser.Scene {
       */
 
       ////// END of DUNGEON GENERATION
+
       this.scene.add('WinnerScene', WinnerScene);
       this.scene.add('LostScene', LostScene);
 
@@ -373,10 +374,11 @@ export default class DungeonScene extends Phaser.Scene {
   }// end of create function
 
  moveTreasure(){
+   // tells server to reset Treasure to original location in server  DB
   this.socket.emit('resetTreasure')
  } 
  placeTreasure(){
-  
+  // display Treasure in correct location (local effect only)
  this.stuffLayer.putTileAt(TILES.CHEST, this.goalRoom.centerX, this.goalRoom.centerY);
 } 
 
@@ -433,7 +435,7 @@ export default class DungeonScene extends Phaser.Scene {
   {
     this.socket.emit('treasureHit', { x: tile.x,y: tile.y})
     this.stuffLayer.removeTileAt(tile.x, tile.y,false,false,this.stuffLayer);
-    
+    // change player color to GOLD indicating has Treasure
     this.player.sprite.setTint(0xfafad2);
     this.player.hasTreasure= true; 
     this.player.speed = 270; 
@@ -498,6 +500,7 @@ export default class DungeonScene extends Phaser.Scene {
 
   }
 
+  // this is the Phaser update per cycle, not the Room update function
   update() {
       if(this.player){
         if(this.player.health < 0){

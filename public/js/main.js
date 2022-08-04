@@ -1,4 +1,5 @@
 import LobbyScene from "../scenes/LobbyScene.js"
+import DungeonScene from "../scenes/DungeonScene.js"
 
 (function () {
     var socket = io();
@@ -7,9 +8,10 @@ import LobbyScene from "../scenes/LobbyScene.js"
     // handle when the create new game button is pressed
     $('#game-container').on('click', '#btn-new-game', function() {
         // create a new socket.io room and assign socket
-        socket.emit('new', socket.id, function(roomID) {
-
-        });
+        
+        socket.emit('newRoom', socket.id, function(roomID) {
+        //socket.emit('newRoom'){//}, function() {
+        });//);
     });
 
     $('#game-container').on('click', '#btn-join-game', function() {
@@ -92,30 +94,19 @@ import LobbyScene from "../scenes/LobbyScene.js"
              }
 
             //console.log(" launching with "+seedList[gameKey]+" from game "+gameKey)
+            //var game = new Phaser.Game(config);
+            //game.scene.add('LobbyScene', LobbyScene, false);
+            //game.scene.start('LobbyScene',{seed: seedList[gameKey]})
+
             var game = new Phaser.Game(config);
-            game.scene.add('LobbyScene', LobbyScene, false);
-            game.scene.start('LobbyScene',{seed: seedList[gameKey]})
+            //console.log('sceneSeed in Game.js '+sceneSeed);
+            // set active to false in config
+            // dont set scene in config
+            // add scene using key from scene modulle
+            game.scene.add('DungeonScene', DungeonScene, false);
+            game.scene.start('DungeonScene',{seed: seedList[gameKey]})
 
-            /*
-            {
-                preload: preload,
-                create: create,
-                update: update
-            }
-
-            function preload ()
-            {
-            }
-
-            function create ()
-            {
-            }
-
-            function update ()
-            {
-            }
-            */
-
+ 
    
     }
 

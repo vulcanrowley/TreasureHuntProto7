@@ -2,6 +2,7 @@ export default class Player {
   constructor(scene, x, y) {
     this.scene = scene;
     this.id = null;
+    this.room = null;
     this.hasTreasure =false;
     this.playerKilled =false;
     this.playerStarved= false;
