@@ -1,0 +1,14 @@
+es6 vs commonJs
+- tried change package.json and made socket.cjs to enable requires
+- tried changing to .mjs for main and DUngeonScene
+
+NOPE was wrong version of Phaser nedds to be 3.55.2
+
+ISSUES
+-- correctly adding players and others- DONE
+-- correct disconnect
+-- all scenes have same configuration
+-- health downcount and display update working
+-- combat works
+-- exits work
+-- load up on server

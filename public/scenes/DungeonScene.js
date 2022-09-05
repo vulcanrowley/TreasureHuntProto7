@@ -157,8 +157,9 @@ export default class DungeonScene extends Phaser.Scene {
           //console.log("room "+room.centerX);
           let width = room.right-room.left;
           let height = room.bottom-room.top;
-          //console.log("width "+ width +" height "+ height );
+          
           const rand = Math.floor(Math.random()*3) // random between 0-2 inclusive
+          //console.log(" random pot assign "+rand)
           if(width*height > 100){
             this.stuffLayer.putTilesAt([13], room.centerX - 1, room.centerY + 1);
             this.stuffLayer.putTilesAt([13], room.centerX + 1, room.centerY + 1);
@@ -170,35 +171,7 @@ export default class DungeonScene extends Phaser.Scene {
             this.stuffLayer.putTilesAt([13], room.centerX + 1, room.centerY + 1);
             this.stuffLayer.putTilesAt([13], room.centerX - 1, room.centerY - 2);
           }
-          /*
-          const rand = Math.random();
-          
-          this.stuffLayer.putTilesAt(TILES.POT, room.centerX - 1, room.centerY + 1);
-          this.stuffLayer.putTilesAt(TILES.POT, room.centerX + 1, room.centerY + 1);
-          this.stuffLayer.putTilesAt(TILES.POT, room.centerX - 1, room.centerY - 2);
-          this.stuffLayer.putTilesAt(TILES.POT, room.centerX + 1, room.centerY - 2);
-      
-          if (rand <= 0.25) {
-              // 25% chance of chest
-              this.stuffLayer.putTileAt(TILES.CHEST, room.centerX, room.centerY);
-          } else if (rand <= 0.5) {
-              // 50% chance of a pot anywhere in the room... except don't block a door!
-              const x = Phaser.Math.Between(room.left + 2, room.right - 2);
-              const y = Phaser.Math.Between(room.top + 2, room.bottom - 2);
-              this.stuffLayer.weightedRandomize(x, y, 1, 1, TILES.POT);
-          } else {
-              // 25% of either 2 or 4 towers, depending on the room size
-              if (room.height >= 9) {
-                  this.stuffLayer.putTilesAt(TILES.TOWER, room.centerX - 1, room.centerY + 1);
-                  this.stuffLayer.putTilesAt(TILES.TOWER, room.centerX + 1, room.centerY + 1);
-                  this.stuffLayer.putTilesAt(TILES.TOWER, room.centerX - 1, room.centerY - 2);
-                  this.stuffLayer.putTilesAt(TILES.TOWER, room.centerX + 1, room.centerY - 2);
-              } else {
-                  this.stuffLayer.putTilesAt(TILES.TOWER, room.centerX - 1, room.centerY - 1);
-                  this.stuffLayer.putTilesAt(TILES.TOWER, room.centerX + 1, room.centerY - 1);
-              }
-          }
-      */
+
       });
 
       // Not exactly correct for the tileset since there are more possible floor tiles, but this will
@@ -294,8 +267,8 @@ export default class DungeonScene extends Phaser.Scene {
     
       // this msg tells us that a new client/player has joined
       this.socket.on('newPlayer', function (playerInfo) {
-        if (roomKey === playerInfo.room) {
-          addOtherPlayers(self, playerInfo)
+        if (roomKey == playerInfo.gameRoom) {
+          addOtherPlayer(self, playerInfo)
         }
       });
 
@@ -336,7 +309,7 @@ export default class DungeonScene extends Phaser.Scene {
             debounceX = obj2.x
             debounceY = obj2.y
             // tell server we hit target
-            self.socket.emit('combatHit', { "attacker": this.player.id, "target": id})
+            self.socket.emit('combatHit', { "attacker": self.player.id, "target": id})
           } 
 
         });
@@ -344,7 +317,7 @@ export default class DungeonScene extends Phaser.Scene {
       };
       
       function addOtherPlayer(self, playerInfo) {
-        
+        console.log(`other Player added ${playerInfo.playerId}`)
         //const otherPlayer = self.physics.add.image(self.px+playerInfo.x, self.py+playerInfo.y, 'other')
         const otherPlayer = self.physics.add.sprite(self.px+playerInfo.x, self.py+playerInfo.y, "other");  
         otherPlayer.playerId = playerInfo.playerId

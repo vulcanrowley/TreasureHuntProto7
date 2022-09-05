@@ -190,9 +190,11 @@ server.on('connection', function (socket) {// was io.
 
         // send room specific socketIO updates
         //console.log("total number of players "+Object.keys(players).length)
-        server.sockets.in(roomID).emit('currentPlayers', players);// .in(roomID)
+
+        //server.sockets.in(roomID).emit('currentPlayers', players);// .in(roomID)
+        server.sockets.to(`${clientID}`).emit('currentPlayers', players);
         //sockets.broadcast.to sends to everyone EXCEPT originator
-        //server.sockets.to(roomID).emit('newPlayer', players[socket.id])
+        socket.to(roomID).emit('newPlayer', players[socket.id])
        
 
         return true;
