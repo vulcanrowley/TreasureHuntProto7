@@ -1,8 +1,8 @@
 export default class Player {
   constructor(scene, x, y) {
     this.scene = scene;
-    this.id = null;
-    this.room = null;
+    this.id = null;// is playerId in server
+    this.gameRoom = null;
     this.hasTreasure =false;
     this.playerKilled =false;
     this.playerStarved= false;
@@ -40,6 +40,7 @@ export default class Player {
   }
 
   update() {
+    //console.log("getting player updated")
     const keys = this.keys;
     const sprite = this.sprite;
     const speed = this.speed;

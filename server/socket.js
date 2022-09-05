@@ -18,7 +18,7 @@
 // --- defines inital player state in the server
 // - send list of all players to new client connection
 // - relay each player movement to all other("playerMoved") when notified by msg ("playerMovement")
-// --- NEEDS CHECKS FOR LEGIT MOVEMENT
+// --- NEEDS ADDITIONAL CHECKS FOR LEGIT MOVEMENT
 // - sets timer to automatically decrease all players health on 1 second interval
 // - sets up collision responses for:
 // --- "jugHit" to deal with gathering food
@@ -40,6 +40,7 @@ var players = {};  // in-memory database of players
 
 var playerColors =['0xff0000','0x00ff00','0xcdcdcd','0x0000ff','0x6495ED' ,'0x3366ff','0x33ccff','0xE06F8B']
 var playerCnt = 0;
+var roomNo = 0;
 // from Lobby code
 var rooms = {};
 //var clients = {};
@@ -52,16 +53,18 @@ var server = new Server();
 // to be set in playtesting)
 //  DISABLED DURING DEVELOPMENT
 setInterval(()=> {
-  if(players){
+  if(players && rooms){
     Object.keys(players).forEach( function (id) {
-      players[id].health -= 1;
-    if(players[id].health< 0){
-      players[id].playerStarved = true;
-      // tell every client that a player is dead
-      //io.emit('playerDisconnected', players[id].playerId);
-      //delete players[players[id]];
-      //console.log('player [' + players[id].playerId + '] disconnected')
-    }
+        if(players[id].room != null){// test if in a room
+            players[id].health -= 1;
+            if(players[id].health< 0){
+                players[id].playerStarved = true;
+                // tell every client that a player is dead
+                //io.emit('playerDisconnected', players[id].playerId);
+                //delete players[players[id]];
+                //console.log('player [' + players[id].playerId + '] disconnected')
+              }
+        }
   });
   // send msg to reduce health for all clients
   server.emit('healthUpdate',players);// was io.
@@ -71,19 +74,15 @@ setInterval(()=> {
 
 
 // establishes socket connection and player in-memory tables when new player connects
+// room nad color not assigned yet
 server.on('connection', function (socket) {// was io.
   playerCnt += 1;
-  if (playerCnt <9){
+  if (playerCnt <30){
     //console.log('player # '+playerCnt+' [' + socket.id + '] connected')
-
-    var playerColor ='0xffffff'
-    if(playerColors.length>0){
-      playerColor =playerColors.pop();
-    }
    
     //console.log("color is "+playerColor)
     players[socket.id] = {
-      room: null, // added for Lobby  
+      gameRoom: null, // added for Lobby  
       health: 100,
       playerKilled: false,
       playerStarved: false,
@@ -91,10 +90,13 @@ server.on('connection', function (socket) {// was io.
       x: Math.floor(Math.random() * 150) -75,// initial x position
       y: Math.floor(Math.random() * 150) -75,// initial y position
       playerId: socket.id,
-      color: playerColor//getPlayerColor()//getRandomColor()// but not gold
+      color: null//playerColor//getPlayerColor()//getRandomColor()// but not gold
     }
-    socket.emit('currentPlayers', players)
-    socket.broadcast.emit('newPlayer', players[socket.id])
+    //tells new logon who is in the server
+   // socket.emit('currentPlayers', {players:players, roomID:null})
+   //socket.emit('currentPlayers', players)// non room version
+    // tells existing players that a new player has joined
+    //socket.broadcast.emit('newPlayer', players[socket.id])
 
     socket.emit('update', rooms);// was client
     broadcastDebugMsg(socket.id + ' has joined the server');
@@ -103,9 +105,9 @@ server.on('connection', function (socket) {// was io.
 
   socket.on('disconnect', function() {   
     var room = findRoomByID(socket.id, rooms);
-    //console.log(" player"+player.id+" and room deletion candidate "+room.id)
+    
     if(room != null){
-        //console.log(" player "+player.id+" and room deletion candidate "+room.id)
+        console.log(" player "+player.id+" and room deletion candidate "+room.id)
         room.players.splice(socket.id, 1)
         //console.log("players in room "+room.players.length)
         if(room.players.length == 0){
@@ -126,21 +128,38 @@ server.on('connection', function (socket) {// was io.
 
 ////////////////// room code from Lobby //////////
     // assign new room at server level
-    socket.on('newRoom', function() {  //data) {//, callback) {
+    /*
+    socket.on('newRoom', function(data, callback) {
         // create new room ID on host
-        var newRoomID = uuid.v4();
+        //var newRoomID = //uuid.v4();
+       roomNo++
+       //creatNewRoom(roomNo)//(newRoomID)
+       if(creatNewRoom(roomNo)){
+        callback(roomNo);
+        }
        
-       creatNewRoom(newRoomID)
-       // if(creatNewRoom(newRoomID)){
-       //     //callback(newRoomID);
-        //}
     });
+*/
+    socket.on("newRoom", (arg1, callback) => {
+        roomNo++
+        //creatNewRoom(roomNo)//(newRoomID)
+        if(creatNewRoom(roomNo)){
+            
+         callback(roomNo);
+         }
+        //callback({
+          //status: "ok"
+        //});
+      });
+
+
 
     function creatNewRoom(roomID){
         
         rooms[roomID] = new Room(roomID); //, clientID);
         broadcastDebugMsg('new room created '  + roomID);
         server.sockets.emit('update', rooms);
+        return true;
     }
 
     socket.on('join', function(roomID, callback) {
@@ -151,8 +170,8 @@ server.on('connection', function (socket) {// was io.
         }
     });
 
-    function connectClientToRoom(roomID, clientID) {//, isNew ) { //isHost) {
-        // if the client is already a host, or already connected to a room
+    function connectClientToRoom(roomID, clientID) {
+        // if the client is  already connected to a room
         if ( players[clientID].room) {  // clients[clientID].isHost ||
             console.log(" already in a room")
             return false;
@@ -160,13 +179,21 @@ server.on('connection', function (socket) {// was io.
 
         //console.log("in connect client "+clientID)
         socket.join(roomID);
-        players[clientID].room = roomID;
+        players[clientID].gameRoom = roomID;
         
         rooms[roomID].addClient(clientID);
                    
         broadcastDebugMsg(clientID + ' has joined room: ' + roomID);
 
+        //update rooms info taht player in roomID
         server.sockets.emit('update', rooms);
+
+        // send room specific socketIO updates
+        //console.log("total number of players "+Object.keys(players).length)
+        server.sockets.in(roomID).emit('currentPlayers', players);// .in(roomID)
+        //sockets.broadcast.to sends to everyone EXCEPT originator
+        //server.sockets.to(roomID).emit('newPlayer', players[socket.id])
+       
 
         return true;
     }// end of ConnectClient
@@ -200,13 +227,16 @@ server.on('connection', function (socket) {// was io.
   socket.on('playerMovement', function (movementData) {
     players[socket.id].x = movementData.x
     players[socket.id].y = movementData.y
+    //const targetRoom = players[socket.id].room
     //console.log(socket.id+ " moved "+ movementData.x);
-    socket.broadcast.emit('playerMoved', players[socket.id])
+    //Sends msg to all other players that socket.id has moved
+    server.sockets.to(players[socket.id].gameRoom).emit('playerMoved', players[socket.id])
   })
 
   // a player died while carrying the Treasure - tell everyone to reset location to original spot
   socket.on('resetTreasure', function () {
-    socket.broadcast.emit('replaceTreasure', players)
+      
+    socket.to(players[socket.id].gameRoom).emit('replaceTreasure', players)
   })
 
   // When player encounters a jug, increase health on server and tell all clients that jug is gone
@@ -214,7 +244,7 @@ server.on('connection', function (socket) {// was io.
     players[socket.id].health += 10;
     
     console.log(socket.id+ " health "+ players[socket.id].health);
-    socket.broadcast.emit('jugRemoved', jug)
+    socket.to(players[socket.id].room).emit('jugRemoved', jug)
   })
 
   // When player finds treasure, delete treasure, change player icon to gold, set has Treasure flag
@@ -223,7 +253,7 @@ server.on('connection', function (socket) {// was io.
     players[socket.id].hasTreasure = true;
     players[socket.id].color = "0xFFFF00";
     console.log(socket.id+ " found treasure ");
-    socket.broadcast.emit('treasureFound',{ jug:jug, player:socket.id} ) //socket.broadcast.emit
+    socket.to(players[socket.id].room).emit('treasureFound',{ jug:jug, player:socket.id} ) //socket.broadcast.emit
   })
 
     // When player touches player, reduce both players by random amount and tell all clients
@@ -266,7 +296,7 @@ server.on('connection', function (socket) {// was io.
     //  - when both layer die in same combat collision
     //  -- drop treasure at spot? or back at original spot??
     //  - has does melee work?
-    server.emit('healthUpdate', players)//socket.broadcast.emit wouldn't update player sending msg
+    server.to(players[socket.id].gameRoom).emit('healthUpdate', players)//socket.broadcast.emit wouldn't update player sending msg
   })
 
     // When player finds Exit and has treasure, transfer to winner/loser scene and end gane
@@ -277,7 +307,7 @@ server.on('connection', function (socket) {// was io.
         console.log(socket.id+ " took the Treasure - has left the Game ");
         // tell everybody else, game over
         let reasonCode ='lost'
-        socket.broadcast.emit('gameOver',{reason:reasonCode})// means another player escaped with treasure
+        socket.to(players[socket.id].gameRoom).emit('gameOver',{reason:reasonCode})// means another player escaped with treasure
       };
 
   })// end of exitHit
@@ -297,3 +327,18 @@ function getRandomColor() {
     }
   return varColor;
 }
+/* 
+function getActiveRooms(io) {
+    // Convert map into 2D list:
+    // ==> [['4ziBKG9XFS06NdtVAAAH', Set(1)], ['room1', Set(2)], ...]
+    const arr = Array.from(io.sockets.adapter.rooms);
+    // Filter rooms whose name exist in set:
+    // ==> [['room1', Set(2)], ['room2', Set(2)]]
+    const filtered = arr.filter(room => !room[1].has(room[0]))
+    // Return only the room name: 
+    // ==> ['room1', 'room2']
+    const res = filtered.map(i => i[0]);
+    return res;
+}
+
+*/

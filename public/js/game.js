@@ -35,4 +35,4 @@ var game = new Phaser.Game(config);
 // dont set scene in config
 // add scene using key from scene modulle
 game.scene.add('DungeonScene', DungeonScene);
-game.scene.start('DungeonScene',{seed: sceneSeed})
+//game.scene.start('DungeonScene',{seed: sceneSeed})

@@ -1,7 +1,7 @@
 import Player from "/js/player.js";
 import LostScene from "/scenes/LostScene.js";
 import WinnerScene from "/scenes/WinnerScene.js";
-import LobbyScene from "/scenes/LobbyScene.js";
+//import LobbyScene from "/scenes/LobbyScene.js";
 import TILES from "/js/tile-mapping.js";
 import TilemapVisibility from "/js/tilemap-visibility.js";
 //import {Scene} from 'phaser'
@@ -28,8 +28,10 @@ export default class DungeonScene extends Phaser.Scene {
       //console.log('seed transfered to Dungeon', data.seed);
       // sceneSeed set by server to make all client scenes the same
       this.sceneSeed = data.seed;
+      this.gameKey = data.seed; // game room is the same as the sceneSeed
+      this.playerID = data.playerID;
+      this.socket = data.socket;
 
-      //game.stage.disableVisibilityChange = true;// maybe game.scene???
 };
       
 
@@ -52,7 +54,8 @@ export default class DungeonScene extends Phaser.Scene {
 
   create() {
     var self = this;
-    this.socket = io();
+    
+   // this.gameRoom = null;
       // Generate a random world based on sceneSeed with a few extra options:
       //  - Rooms should only have odd number dimensions so that they have a center tile.
       //  - Doors should be at least 2 tiles away from corners, so that we can place a corner tile on
@@ -215,14 +218,6 @@ export default class DungeonScene extends Phaser.Scene {
 
 
       /*
-      this.stuffLayer.setTileIndexCallback([13], (tile) => {
-          this.stuffLayer.setTileIndexCallback([13], null);
-          console.log("hit jug "+tile.x+" , "+tile.y);
-          //this.stuffLayer.removeTileAt(tile.x, tile.y);
-          //this.stuffLayer.removeTileAtWorldXY(tile.x, tile.y);
-          map.removeTileAt(tile.x, tile.y,false,false,this.stuffLayer);
-          this.player.health += 10;
-          console.log("player health "+ this.player.health);
           //this.hasPlayerReachedStairs = true;
           //this.player.freeze();
           //const cam = this.cameras.main;
@@ -255,33 +250,109 @@ export default class DungeonScene extends Phaser.Scene {
           backgroundColor: "#ffffff",
       })
       .setScrollFactor(0);
-
-    //SocketIO Setup
-    // Drived From https://github.com/ivangfr/socketio-express-phaser3
-
       // collison with other player
       this.otherPlayers = this.physics.add.group({defaultKey:'otherPlayer'//,
       //bounceX: 1,
       //bounceY: 1.
     });
-     
+
+
+    //!!!!!!!!!!!! SocketIO Setup
+    // Drived From https://github.com/ivangfr/socketio-express-phaser3
+
+    // ask server for the player to join this room
+    this.socket.emit('join', this.gameKey, function(data) {
+    
+    });
 
       // this msg from server lists all current players including us
-      // sent when we first join the game
-    this.socket.on('currentPlayers', function (players) {
-        Object.keys(players).forEach(function (id) {
-          if (players[id].playerId === self.socket.id) {
-            self.addPlayer(self, players[id])
-          } else {
-            self.addOtherPlayers(self, players[id])
-          }
-        })
-      })
+      // sent when we first join the game room
+    
+      let PlayerID =this.playerID
+      var roomKey = this.gameKey
+      
+      
+      this.socket.on('currentPlayers', function (people) {
+          //console.log(" in client currentPlayers")
+          //console.log("total number of people "+Object.keys(people).length)
+          //console.log(" this player "+people[PlayerID].playerId)
+        Object.keys(people).forEach(function (id) {
+            console.log(` players in LobbyScene ${people[id].playerId} in game ${people[id].gameRoom}`);
+            //console.log(" socket ID in cP "+PlayerID)
+          if(people[id].gameRoom == roomKey){
+              if (people[id].playerId == PlayerID ) {
+           
+                  addPlayer(self, people[id]);
+              } else{
+                  addOtherPlayer(self, people[id]);
+              }
+          }  
+
+        });
+      });
+
     
       // this msg tells us that a new client/player has joined
       this.socket.on('newPlayer', function (playerInfo) {
-        self.addOtherPlayers(self, playerInfo)
-      })
+        if (roomKey === playerInfo.room) {
+          addOtherPlayers(self, playerInfo)
+        }
+      });
+
+      
+      function addPlayer(self, playerInfo) {
+        // Place the player in the first room
+        
+        var first_x =self.px+playerInfo.x;
+        var first_y =self.py+playerInfo.y;
+        
+        self.player = new Player(self,first_x, first_y);
+
+        self.player.id = playerInfo.playerId;
+        self.player.gameRoom = self.gameRoom
+        self.camera.startFollow(self.player.sprite);
+
+        console.log(" player being added "+self.player.id)
+
+        //Watch the player and tilemap layers for collisions, for the duration of the scene:
+        self.physics.add.collider(self.player.sprite, self.groundLayer);
+        self.physics.add.collider(self.player.sprite, self.stuffLayer);
+
+        // combat collison handler
+        let debounceX = 0
+        let debounceY = 0
+        self.physics.add.overlap(self.player.sprite, self.otherPlayers, (obj1, obj2) => {
+          let id =0;
+          if (debounceX != obj2.x || debounceY != obj2.y){
+            // get id of obj2(target)
+            // search otherplayer for the same x,y as the target, to get its Id
+            self.otherPlayers.getChildren().forEach(function (otherPlayer) {
+              if (otherPlayer.x == obj2.x && otherPlayer.y == obj2.y) {
+                id = otherPlayer.playerId;
+                
+              }
+            });
+          
+            debounceX = obj2.x
+            debounceY = obj2.y
+            // tell server we hit target
+            self.socket.emit('combatHit', { "attacker": this.player.id, "target": id})
+          } 
+
+        });
+
+      };
+      
+      function addOtherPlayer(self, playerInfo) {
+        
+        //const otherPlayer = self.physics.add.image(self.px+playerInfo.x, self.py+playerInfo.y, 'other')
+        const otherPlayer = self.physics.add.sprite(self.px+playerInfo.x, self.py+playerInfo.y, "other");  
+        otherPlayer.playerId = playerInfo.playerId
+        otherPlayer.setTint(playerInfo.color)
+        self.otherPlayers.add(otherPlayer)
+
+
+      }
     
       // msg to remove other player who died
       this.socket.on('playerDisconnected', function (playerId) {
@@ -342,7 +413,8 @@ export default class DungeonScene extends Phaser.Scene {
 
       this.socket.on('healthUpdate', function (players) {
         Object.keys(players).forEach(function (id) {
-          if (players[id].playerId === self.socket.id) {
+          // test if this is me and am I in a room
+          if (players[id].playerId === self.socket.id && players[id].room != null) {
             self.player.health =players[id].health;
             //self.player.sprite.setTint(players[id].color)
             if(players[id].playerKilled){
@@ -359,15 +431,17 @@ export default class DungeonScene extends Phaser.Scene {
               self.changeScene('starved')
             }
             console.log(" player: "+self.player.id+" health is "+self.player.health)
-          } else {
+          } /*else {
+            
             // while we're here, set everybody color
             self.otherPlayers.getChildren().forEach(function (otherPlayer) {
               if(otherPlayer.playerId === players[id].playerId){
                 otherPlayer.setTint(players[id].color)
               }// end of if
+              
             })// end of iter
           }// end else - sets color of other player
-
+*/
         })
       })
 
@@ -379,7 +453,7 @@ export default class DungeonScene extends Phaser.Scene {
  } 
  placeTreasure(){
   // display Treasure in correct location (local effect only)
- this.stuffLayer.putTileAt(TILES.CHEST, this.goalRoom.centerX, this.goalRoom.centerY);
+ self.stuffLayer.putTileAt(TILES.CHEST, this.goalRoom.centerX, this.goalRoom.centerY);
 } 
 
  changeScene(reason){ 
@@ -450,58 +524,10 @@ export default class DungeonScene extends Phaser.Scene {
   }
 
 
-  addPlayer(self, playerInfo) {
-    // Place the player in the first room
-    
-    var first_x =self.px+playerInfo.x;
-    var first_y =self.py+playerInfo.y;
-    
-    self.player = new Player(self,first_x, first_y);
-    self.player.id = playerInfo.playerId;
-    self.camera.startFollow(this.player.sprite);
-
-    //Watch the player and tilemap layers for collisions, for the duration of the scene:
-    this.physics.add.collider(self.player.sprite, this.groundLayer);
-    this.physics.add.collider(self.player.sprite, this.stuffLayer);
-
-    // combat collison handler
-    let debounceX = 0
-    let debounceY = 0
-    this.physics.add.overlap(this.player.sprite, this.otherPlayers, (obj1, obj2) => {
-      let id =0;
-      if (debounceX != obj2.x || debounceY != obj2.y){
-        // get id of obj2(target)
-        // search otherplayer for the same x,y as the target, to get its Id
-        self.otherPlayers.getChildren().forEach(function (otherPlayer) {
-          if (otherPlayer.x == obj2.x && otherPlayer.y == obj2.y) {
-            id = otherPlayer.playerId;
-            
-          }
-        });
-      
-        debounceX = obj2.x
-        debounceY = obj2.y
-        // tell server we hit target
-        this.socket.emit('combatHit', { "attacker": this.player.id, "target": id})
-      } 
-
-    });
-
-  }
-  
-  addOtherPlayers(self, playerInfo) {
-    
-    //const otherPlayer = self.physics.add.image(self.px+playerInfo.x, self.py+playerInfo.y, 'other')
-    const otherPlayer = this.physics.add.sprite(self.px+playerInfo.x, self.py+playerInfo.y, "other");  
-    otherPlayer.playerId = playerInfo.playerId
-    otherPlayer.setTint(playerInfo.color)
-    self.otherPlayers.add(otherPlayer)
-
-
-  }
 
   // this is the Phaser update per cycle, not the Room update function
   update() {
+
       if(this.player){
         if(this.player.health < 0){
           console.log("Dead!!");
@@ -544,8 +570,9 @@ export default class DungeonScene extends Phaser.Scene {
       const playerRoom = this.dungeon.getRoomAt(playerTileX, playerTileY);
 
       this.tilemapVisibility.setActiveRoom(playerRoom);
-    }  
-  }
+
+    } // end of existing player test 
+  }// rnd of Phaser Update function
 
 }//end of Dungeon class
 

@@ -1,3 +1,5 @@
+//////////// DEPRECATED - now starts with server/server.js //////////////
+
 /////////////////////////////////////////////////////////////
 // index.js is the top level game server
 // when a client connects, creates player and Socket connection and sends client
