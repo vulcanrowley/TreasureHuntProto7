@@ -81,6 +81,7 @@ export default class DungeonScene extends Phaser.Scene {
           width: this.dungeon.width,
           height: this.dungeon.height,
       });
+      console.log(`scene seed is ${this.sceneSeed}`)
       console.log(' number of rooms - '+this.dungeon.rooms.length);
       const tileset = map.addTilesetImage("tiles", null, 48, 48, 1, 2); // 1px margin, 2px spacing
       this.groundLayer = map.createBlankLayer("Ground", tileset).fill(TILES.BLANK);
@@ -127,8 +128,9 @@ export default class DungeonScene extends Phaser.Scene {
 
       // Separate out the rooms into:
       //  - The starting room (index = 0)
-      //  - A random room to be designated as the end room (with stairs and nothing else)
-      //  - An array of 90% of the remaining rooms, for placing random stuff (leaving 10% empty)
+      //  - the last room generated is the GOAL
+      //  - the next two rooms farest from the start are assigned as EXIT rooms
+      //  - all othe rooms are assigned a number of food pots depending on their size
       const rooms = this.dungeon.rooms.slice();
       // segregate special rooms
       const startRoom = rooms.shift();
@@ -139,7 +141,7 @@ export default class DungeonScene extends Phaser.Scene {
       const endRoom2 =Phaser.Utils.Array.RemoveAt(rooms,rooms.length-1);
       //const endRoom2 = Phaser.Utils.Array.RemoveRandomElement(rooms);
 
-      const otherRooms = Phaser.Utils.Array.Shuffle(rooms).slice(0, rooms.length * 0.98);
+      //const otherRooms = Phaser.Utils.Array.Shuffle(rooms).slice(0, rooms.length * 0.98);
       this.px = map.tileToWorldX(startRoom.centerX);
       this.py = map.tileToWorldY(startRoom.centerY);
 
@@ -151,15 +153,13 @@ export default class DungeonScene extends Phaser.Scene {
       this.stuffLayer.putTilesAt(TILES.EXIT, endRoom2.centerX, endRoom2.centerY);
 
       
-
-      // Place stuff in the 90% "otherRooms"
-      otherRooms.forEach((room) => {
+      
+      // Place food pots in all rooms
+      rooms.forEach((room) => {  
           //console.log("room "+room.centerX);
           let width = room.right-room.left;
           let height = room.bottom-room.top;
-          
-          const rand = Math.floor(Math.random()*3) // random between 0-2 inclusive
-          //console.log(" random pot assign "+rand)
+
           if(width*height > 100){
             this.stuffLayer.putTilesAt([13], room.centerX - 1, room.centerY + 1);
             this.stuffLayer.putTilesAt([13], room.centerX + 1, room.centerY + 1);
