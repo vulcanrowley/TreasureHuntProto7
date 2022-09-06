@@ -6,7 +6,7 @@ NOPE was wrong version of Phaser nedds to be 3.55.2
 
 ISSUES
 -- correctly adding players and others- DONE
--- correct disconnect
+-- correct disconnect -FIXED
 -- all scenes have same configuration- DONE
 -- get individual colors working on otherPlayers
 -- health downcount and display update working

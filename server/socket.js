@@ -107,10 +107,10 @@ server.on('connection', function (socket) {// was io.
     var room = findRoomByID(socket.id, rooms);
     
     if(room != null){
-        console.log(" player "+player.id+" and room deletion candidate "+room.id)
-        room.players.splice(socket.id, 1)
+        //console.log(" player "+socket.id+" and room deletion candidate "+room.id)
+        room.clients.splice(socket.id, 1)
         //console.log("players in room "+room.players.length)
-        if(room.players.length == 0){
+        if(room.clients.length == 0){
             //console.log("room being deleted "+room.id)
             delete rooms[room.id];
         }
@@ -123,7 +123,7 @@ server.on('connection', function (socket) {// was io.
 
     broadcastDebugMsg(socket.id + ' has disconnected from the server');
     delete players[socket.id];
-    server.emit('playerDisconnected', socket.id) // was io. from original Dungeon
+    server.sockets.emit('playerDisconnected', socket.id) // was io. from original Dungeon
 });// end of disconnect
 
 ////////////////// room code from Lobby //////////
@@ -213,8 +213,8 @@ server.on('connection', function (socket) {// was io.
                 //if (room.hostID === hostID) {
                 //    return room;
                 //}
-                for (var i = 0; i < room.players.length; i++) {
-                    if (room.players[i] === playerID) {
+                for (var i = 0; i < room.clients.length; i++) {
+                    if (room.clients[i] === playerID) {
                         return room;
                     }
                 }
