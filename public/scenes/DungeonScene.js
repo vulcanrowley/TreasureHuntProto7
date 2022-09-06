@@ -54,7 +54,9 @@ export default class DungeonScene extends Phaser.Scene {
 
   create() {
     var self = this;
-    
+    // MAX of 8 players per game
+    var opponentCnt = -1;
+    var playerColors =['0xff0000','0x00ff00','0xcdcdcd','0x0000ff','0x6495ED' ,'0x3366ff','0x33ccff','0xE06F8B']
    // this.gameRoom = null;
       // Generate a random world based on sceneSeed with a few extra options:
       //  - Rooms should only have odd number dimensions so that they have a center tile.
@@ -250,7 +252,7 @@ export default class DungeonScene extends Phaser.Scene {
           //console.log("total number of people "+Object.keys(people).length)
           //console.log(" this player "+people[PlayerID].playerId)
         Object.keys(people).forEach(function (id) {
-            console.log(` players in LobbyScene ${people[id].playerId} in game ${people[id].gameRoom}`);
+            //console.log(` players in LobbyScene ${people[id].playerId} in game ${people[id].gameRoom}`);
             //console.log(" socket ID in cP "+PlayerID)
           if(people[id].gameRoom == roomKey){
               if (people[id].playerId == PlayerID ) {
@@ -285,7 +287,7 @@ export default class DungeonScene extends Phaser.Scene {
         self.player.gameRoom = self.gameRoom
         self.camera.startFollow(self.player.sprite);
 
-        console.log(" player being added "+self.player.id)
+        console.log("Player being added "+self.player.id)
 
         //Watch the player and tilemap layers for collisions, for the duration of the scene:
         self.physics.add.collider(self.player.sprite, self.groundLayer);
@@ -317,11 +319,12 @@ export default class DungeonScene extends Phaser.Scene {
       };
       
       function addOtherPlayer(self, playerInfo) {
+        opponentCnt++
         console.log(`other Player added ${playerInfo.playerId}`)
         //const otherPlayer = self.physics.add.image(self.px+playerInfo.x, self.py+playerInfo.y, 'other')
         const otherPlayer = self.physics.add.sprite(self.px+playerInfo.x, self.py+playerInfo.y, "other");  
         otherPlayer.playerId = playerInfo.playerId
-        otherPlayer.setTint(playerInfo.color)
+        otherPlayer.setTint(playerColors[opponentCnt]);
         self.otherPlayers.add(otherPlayer)
 
 
@@ -483,8 +486,9 @@ export default class DungeonScene extends Phaser.Scene {
     this.socket.emit('treasureHit', { x: tile.x,y: tile.y})
     this.stuffLayer.removeTileAt(tile.x, tile.y,false,false,this.stuffLayer);
     // change player color to GOLD indicating has Treasure
-    this.player.sprite.setTint(0xfafad2);
+    //this.player.sprite.setTint(0xfafad2);
     this.player.hasTreasure= true; 
+    // playered slowed down by weight of Treasure
     this.player.speed = 270; 
     
   }

@@ -38,7 +38,7 @@ var Room = require('./room.js');
 /////////////////////////////////////////////////////////////////////////////////
 var players = {};  // in-memory database of players
 
-var playerColors =['0xff0000','0x00ff00','0xcdcdcd','0x0000ff','0x6495ED' ,'0x3366ff','0x33ccff','0xE06F8B']
+
 var playerCnt = 0;
 var roomNo = 0;
 // from Lobby code
@@ -74,7 +74,7 @@ setInterval(()=> {
 
 
 // establishes socket connection and player in-memory tables when new player connects
-// room nad color not assigned yet
+// room and color not assigned yet
 server.on('connection', function (socket) {// was io.
   playerCnt += 1;
   if (playerCnt <30){
@@ -87,13 +87,13 @@ server.on('connection', function (socket) {// was io.
       playerKilled: false,
       playerStarved: false,
       hasTreasure: false,
-      x: Math.floor(Math.random() * 150) -75,// initial x position
-      y: Math.floor(Math.random() * 150) -75,// initial y position
+      x: Math.floor(Math.random() * 150) -55,// initial x position
+      y: Math.floor(Math.random() * 150) -55,// initial y position
       playerId: socket.id,
       color: null//playerColor//getPlayerColor()//getRandomColor()// but not gold
     }
-    //tells new logon who is in the server
-   // socket.emit('currentPlayers', {players:players, roomID:null})
+    
+   
    //socket.emit('currentPlayers', players)// non room version
     // tells existing players that a new player has joined
     //socket.broadcast.emit('newPlayer', players[socket.id])
@@ -128,18 +128,7 @@ server.on('connection', function (socket) {// was io.
 
 ////////////////// room code from Lobby //////////
     // assign new room at server level
-    /*
-    socket.on('newRoom', function(data, callback) {
-        // create new room ID on host
-        //var newRoomID = //uuid.v4();
-       roomNo++
-       //creatNewRoom(roomNo)//(newRoomID)
-       if(creatNewRoom(roomNo)){
-        callback(roomNo);
-        }
-       
-    });
-*/
+
     socket.on("newRoom", (arg1, callback) => {
         roomNo++
         //creatNewRoom(roomNo)//(newRoomID)

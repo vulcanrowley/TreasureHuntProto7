@@ -8,8 +8,11 @@ ISSUES
 -- correctly adding players and others- DONE
 -- correct disconnect -FIXED
 -- all scenes have same configuration- DONE
--- get individual colors working on otherPlayers
+-- get individual colors working on otherPlayers DONE also increased initial char spacing TEMP FIX
+-- verify all socketIO protocols work
 -- health downcount and display update working
 -- combat works
 -- exits work
+-- randomize sceneSeed when server starts
+-- find way to make first room max size everytime and assign starting positions
 -- load up on server
