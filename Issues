@@ -10,9 +10,14 @@ ISSUES
 -- all scenes have same configuration- DONE
 -- get individual colors working on otherPlayers DONE also increased initial char spacing TEMP FIX
 -- verify all socketIO protocols work
--- health downcount and display update working
--- combat works
+-- health downcount and display update working -DONE
+-- combat works - DONE
+--- late joiner code corrects for Treasure Chest taken but doesn't reset food pots
 -- exits work
--- randomize sceneSeed when server starts
+-- randomize sceneSeed when server starts - disable during Dev
 -- find way to make first room max size everytime and assign starting positions
+-- put in Ready state and simultaneos start
 -- load up on server
+
+Note: dead player will rejoin Lobby as new player and can rejoin game that killed 
+his first incarnation - is this OK?

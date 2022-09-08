@@ -287,7 +287,7 @@ export default class DungeonScene extends Phaser.Scene {
         self.player.gameRoom = self.gameRoom
         self.camera.startFollow(self.player.sprite);
 
-        console.log("Player being added "+self.player.id)
+        //console.log("Player being added "+self.player.id)
 
         //Watch the player and tilemap layers for collisions, for the duration of the scene:
         self.physics.add.collider(self.player.sprite, self.groundLayer);
@@ -304,7 +304,6 @@ export default class DungeonScene extends Phaser.Scene {
             self.otherPlayers.getChildren().forEach(function (otherPlayer) {
               if (otherPlayer.x == obj2.x && otherPlayer.y == obj2.y) {
                 id = otherPlayer.playerId;
-                
               }
             });
           
@@ -320,11 +319,18 @@ export default class DungeonScene extends Phaser.Scene {
       
       function addOtherPlayer(self, playerInfo) {
         opponentCnt++
-        console.log(`other Player added ${playerInfo.playerId}`)
+        //console.log(`other Player added ${playerInfo.playerId}`)
         //const otherPlayer = self.physics.add.image(self.px+playerInfo.x, self.py+playerInfo.y, 'other')
         const otherPlayer = self.physics.add.sprite(self.px+playerInfo.x, self.py+playerInfo.y, "other");  
         otherPlayer.playerId = playerInfo.playerId
         otherPlayer.setTint(playerColors[opponentCnt]);
+        if(playerInfo.hasTreasure){
+          otherPlayer.setTint("0xfafad2");
+          //self.removeItem({x:self.treasureChest.x,y:self.treasureChest.y});
+          //  self.stuffLayer.putTileAt(TILES.CHEST, this.goalRoom.centerX, this.goalRoom.centerY);
+         // this.stuffLayer.removeTileAt(this.goalRoom.centerX, this.goalRoom.centerY,false,false,this.stuffLayer);
+         self.removeItem({x: self.goalRoom.centerX, y: self.goalRoom.centerY});
+        }
         self.otherPlayers.add(otherPlayer)
 
 
@@ -359,11 +365,16 @@ export default class DungeonScene extends Phaser.Scene {
       })
 
       this.socket.on('treasureFound', function(info){
+        console.log(`Treasure Found by ${info.player}`)
         self.otherPlayers.getChildren().forEach(function (otherPlayer) {
           if (otherPlayer.playerId === info.player) {
+            //console.log(" color changed")
             otherPlayer.setTint("0xfafad2");
             //console.log(" player: "+self.player.id+" health is "+self.player.health)
           }
+          // save chest location to update late joiner
+         // self.treasureChest = info.jug;
+          //console.log("removing Treasure")
           self.removeItem(info.jug);
         })
       });  
@@ -388,9 +399,10 @@ export default class DungeonScene extends Phaser.Scene {
         })    
 
       this.socket.on('healthUpdate', function (players) {
+       // console.log("in health update")
         Object.keys(players).forEach(function (id) {
           // test if this is me and am I in a room
-          if (players[id].playerId === self.socket.id && players[id].room != null) {
+          if (players[id].playerId === self.socket.id && players[id].gameRoom != null) {
             self.player.health =players[id].health;
             //self.player.sprite.setTint(players[id].color)
             if(players[id].playerKilled){
@@ -407,17 +419,7 @@ export default class DungeonScene extends Phaser.Scene {
               self.changeScene('starved')
             }
             console.log(" player: "+self.player.id+" health is "+self.player.health)
-          } /*else {
-            
-            // while we're here, set everybody color
-            self.otherPlayers.getChildren().forEach(function (otherPlayer) {
-              if(otherPlayer.playerId === players[id].playerId){
-                otherPlayer.setTint(players[id].color)
-              }// end of if
-              
-            })// end of iter
-          }// end else - sets color of other player
-*/
+          } 
         })
       })
 

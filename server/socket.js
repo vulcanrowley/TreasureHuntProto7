@@ -52,10 +52,11 @@ var server = new Server();
 // repeating timer to reduce all players health by 1 point every 1 second (final parameters 
 // to be set in playtesting)
 //  DISABLED DURING DEVELOPMENT
+/*
 setInterval(()=> {
   if(players && rooms){
     Object.keys(players).forEach( function (id) {
-        if(players[id].room != null){// test if in a room
+        if(players[id].gameRoom != null){// test if in a room
             players[id].health -= 1;
             if(players[id].health< 0){
                 players[id].playerStarved = true;
@@ -70,7 +71,7 @@ setInterval(()=> {
   server.emit('healthUpdate',players);// was io.
  }
 },1000)// reduce health for all players once per second
-
+*/
 
 
 // establishes socket connection and player in-memory tables when new player connects
@@ -83,7 +84,7 @@ server.on('connection', function (socket) {// was io.
     //console.log("color is "+playerColor)
     players[socket.id] = {
       gameRoom: null, // added for Lobby  
-      health: 100,
+      health: 20,
       playerKilled: false,
       playerStarved: false,
       hasTreasure: false,
@@ -221,7 +222,7 @@ server.on('connection', function (socket) {// was io.
     //const targetRoom = players[socket.id].room
     //console.log(socket.id+ " moved "+ movementData.x);
     //Sends msg to all other players that socket.id has moved
-    server.sockets.to(players[socket.id].gameRoom).emit('playerMoved', players[socket.id])
+    socket.to(players[socket.id].gameRoom).emit('playerMoved', players[socket.id])
   })
 
   // a player died while carrying the Treasure - tell everyone to reset location to original spot
@@ -235,7 +236,7 @@ server.on('connection', function (socket) {// was io.
     players[socket.id].health += 10;
     
     console.log(socket.id+ " health "+ players[socket.id].health);
-    socket.to(players[socket.id].room).emit('jugRemoved', jug)
+    socket.to(players[socket.id].gameRoom).emit('jugRemoved', jug)
   })
 
   // When player finds treasure, delete treasure, change player icon to gold, set has Treasure flag
@@ -243,13 +244,13 @@ server.on('connection', function (socket) {// was io.
   socket.on('treasureHit', function (jug) {
     players[socket.id].hasTreasure = true;
     players[socket.id].color = "0xFFFF00";
-    console.log(socket.id+ " found treasure ");
-    socket.to(players[socket.id].room).emit('treasureFound',{ jug:jug, player:socket.id} ) //socket.broadcast.emit
+    //console.log(socket.id+ " found treasure "+" in room "+players[socket.id].gameRoom);
+    socket.to(players[socket.id].gameRoom).emit('treasureFound',{ jug:jug, player:socket.id} ) //socket.broadcast.emit
   })
 
     // When player touches player, reduce both players by random amount and tell all clients
   socket.on('combatHit', function (fighters) {
-   
+   //console.log(`hit in server with ${fighters.attacker} and ${fighters.target}`)
     // reduce health in both players by random amount in range 0-4
     //console.log(" attacker "+fighters.attacker+" target "+fighters.target)
     players[fighters.attacker].health -= Math.floor(Math.random() * 5)
@@ -283,11 +284,22 @@ server.on('connection', function (socket) {// was io.
         
       }
     }
+    /*  doesn't seem to work ??????????????
+    // push target slightly
+    if(players[fighters.attacker].x >players[fighters.target].x ){
+      players[fighters.target].x++
+    }else{players[fighters.target].x--}
+    if(players[fighters.attacker].y >players[fighters.target].y ){
+      players[fighters.target].y++
+    }else{players[fighters.target].y--}
+    socket.in(players[fighters.target].gameRoom).emit('playerMoved', players[fighters.target])
+    */
+    
     //edge conditions
     //  - when both layer die in same combat collision
-    //  -- drop treasure at spot? or back at original spot??
+    //  -- drop treasure back at original spot??
     //  - has does melee work?
-    server.to(players[socket.id].gameRoom).emit('healthUpdate', players)//socket.broadcast.emit wouldn't update player sending msg
+    server.to(players[fighters.target].gameRoom).emit('healthUpdate', players)//socket.broadcast.emit wouldn't update player sending msg
   })
 
     // When player finds Exit and has treasure, transfer to winner/loser scene and end gane

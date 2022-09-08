@@ -6,7 +6,7 @@ export default class Player {
     this.hasTreasure =false;
     this.playerKilled =false;
     this.playerStarved= false;
-    this.health =100;
+    this.health =20;
     this.x = x;
     this.y = y;
     this.speed = 300;
