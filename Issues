@@ -9,13 +9,14 @@ ISSUES
 -- correct disconnect -FIXED
 -- all scenes have same configuration- DONE
 -- get individual colors working on otherPlayers DONE also increased initial char spacing TEMP FIX
--- verify all socketIO protocols work
+-- verify all socketIO protocols work - MOSTLY DONE
 -- health downcount and display update working -DONE
 -- combat works - DONE
 --- late joiner code corrects for Treasure Chest taken but doesn't reset food pots
--- exits work
+-- exits work - DONE
 -- randomize sceneSeed when server starts - disable during Dev
--- find way to make first room max size everytime and assign starting positions
+-- find way to make first room max size everytime and DONE
+==== assign starting positions
 -- put in Ready state and simultaneos start
 -- load up on server
 

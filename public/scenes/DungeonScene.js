@@ -63,8 +63,8 @@ export default class DungeonScene extends Phaser.Scene {
       //  - Doors should be at least 2 tiles away from corners, so that we can place a corner tile on
       //    either side of the door location
       this.dungeon = new Dungeon({
-      width: 30,
-      height: 30,
+      width: 50,
+      height: 50,
       doorPadding: 2,
       randomSeed: this.sceneSeed,//this.level,
       rooms: {
