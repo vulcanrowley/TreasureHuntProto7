@@ -418,7 +418,7 @@ export default class DungeonScene extends Phaser.Scene {
               }
               self.changeScene('starved')
             }
-            console.log(" player: "+self.player.id+" health is "+self.player.health)
+            //console.log(" player: "+self.player.id+" health is "+self.player.health)
           } 
         })
       })

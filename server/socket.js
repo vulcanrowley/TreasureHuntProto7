@@ -1,4 +1,5 @@
 /****************************
+ * "start": "node server/socket.js",
  * Module to handle all Socket IO communications server <==> player
  * 
  * Functions
