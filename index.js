@@ -77,8 +77,8 @@ setInterval(()=> {
 // establishes socket connection and player in-memory tables when new player connects
 // room and color not assigned yet
 server.on('connection', function (socket) {// was io.
-  playerCnt += 1;
-  if (playerCnt <20){
+  //playerCnt += 1;
+  //if (playerCnt <20){
     //console.log('player # '+playerCnt+' [' + socket.id + '] connected')
    
     //console.log("color is "+playerColor)
@@ -90,8 +90,8 @@ server.on('connection', function (socket) {// was io.
       playerKilled: false,
       playerStarved: false,
       hasTreasure: false,
-      x: -150 + (playerCnt % 4)*100, //Math.floor(Math.random() * 150) -55,// initial x position
-      y: 100 + (100 * (Math.floor(playerCnt/4- 0.1)% 4)), //Math.floor(Math.random() * 150) -55,// initial y position
+      x: 0,//-150 + (playerCnt % 4)*100, //Math.floor(Math.random() * 150) -55,// initial x position
+      y: 0,//100 + (100 * (Math.floor(playerCnt/4- 0.1)% 4)), //Math.floor(Math.random() * 150) -55,// initial y position
       playerId: socket.id,
       color: null//playerColor//getPlayerColor()//getRandomColor()// but not gold
     }
@@ -104,7 +104,7 @@ server.on('connection', function (socket) {// was io.
     socket.emit('update', rooms);// was client
     broadcastDebugMsg(socket.id + ' has joined the server');
 
-  }// end of player count IF
+  //}// end of player count IF
 
   socket.on('disconnect', function() {   
     var room = findRoomByID(socket.id, rooms);
@@ -172,8 +172,16 @@ server.on('connection', function (socket) {// was io.
         //console.log("in connect client "+clientID)
         socket.join(roomID);
         players[clientID].gameRoom = roomID;
-        
         rooms[roomID].addClient(clientID);
+
+        var playerCnt = rooms[roomID].clients.length;
+        //console.log(`# of players in room ${playerCnt}`)
+        //console.log(` playerCnt mode ${Math.floor(playerCnt/4- 0.1)% 4}`)
+        players[clientID].x = -150 + (playerCnt % 4)*100, //Math.floor(Math.random() * 150) -55,// initial x position
+        players[clientID].y = 100 + (100 * (Math.floor(playerCnt/4- 0.1)% 4)), //Math.floor(Math.random() * 150) -55,// initial y position
+      
+        
+        
                    
         broadcastDebugMsg(clientID + ' has joined room: ' + roomID);
 
