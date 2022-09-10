@@ -14,11 +14,11 @@ ISSUES
 -- combat works - DONE
 --- late joiner code corrects for Treasure Chest taken but doesn't reset food pots
 -- exits work - DONE
--- randomize sceneSeed when server starts - disable during Dev
+-- randomize sceneSeed when server starts - DONE
 -- find way to make first room max size everytime (mod Dungeon script) DONE
-==== assign starting positions
+==== assign starting positions  DONE
 -- put in Ready state and simultaneos start
 -- load up on server
 
 Note: dead player will rejoin Lobby as new player and can rejoin game that killed 
-his first incarnation - is this OK?
+his first incarnation - is this OK? SHOULD BE FIXED IN READY START

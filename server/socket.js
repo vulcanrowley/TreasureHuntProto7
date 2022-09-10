@@ -40,7 +40,7 @@ var players = {};  // in-memory database of players
 
 
 var playerCnt = 0;
-var roomNo = 0;
+var roomNo = generateRandomNumber(4); 
 // from Lobby code
 var rooms = {};
 //var clients = {};
@@ -78,18 +78,20 @@ setInterval(()=> {
 // room and color not assigned yet
 server.on('connection', function (socket) {// was io.
   playerCnt += 1;
-  if (playerCnt <30){
+  if (playerCnt <20){
     //console.log('player # '+playerCnt+' [' + socket.id + '] connected')
    
     //console.log("color is "+playerColor)
+    //console.log(`x = ${-150 + ((playerCnt % 4))*100} where mode is ${(playerCnt % 4)}`)
+    //console.log(`y = ${ 100 + (100 * (Math.floor(playerCnt/4- 0.1)% 4))} where ${Math.floor(playerCnt/4- 0.1)} mode is ${Math.floor(playerCnt/4 -.1)% 4}`)
     players[socket.id] = {
       gameRoom: null, // added for Lobby  
-      health: 20,
+      health: 100,
       playerKilled: false,
       playerStarved: false,
       hasTreasure: false,
-      x: Math.floor(Math.random() * 150) -55,// initial x position
-      y: Math.floor(Math.random() * 150) -55,// initial y position
+      x: -150 + (playerCnt % 4)*100, //Math.floor(Math.random() * 150) -55,// initial x position
+      y: 100 + (100 * (Math.floor(playerCnt/4- 0.1)% 4)), //Math.floor(Math.random() * 150) -55,// initial y position
       playerId: socket.id,
       color: null//playerColor//getPlayerColor()//getRandomColor()// but not gold
     }
@@ -330,18 +332,7 @@ function getRandomColor() {
     }
   return varColor;
 }
-/* 
-function getActiveRooms(io) {
-    // Convert map into 2D list:
-    // ==> [['4ziBKG9XFS06NdtVAAAH', Set(1)], ['room1', Set(2)], ...]
-    const arr = Array.from(io.sockets.adapter.rooms);
-    // Filter rooms whose name exist in set:
-    // ==> [['room1', Set(2)], ['room2', Set(2)]]
-    const filtered = arr.filter(room => !room[1].has(room[0]))
-    // Return only the room name: 
-    // ==> ['room1', 'room2']
-    const res = filtered.map(i => i[0]);
-    return res;
-}
 
-*/
+function generateRandomNumber(n) {
+  return Math.floor(Math.random() * (9 * Math.pow(10, n - 1))) + Math.pow(10, n - 1);
+};

@@ -145,7 +145,7 @@ export default class DungeonScene extends Phaser.Scene {
 
       //const otherRooms = Phaser.Utils.Array.Shuffle(rooms).slice(0, rooms.length * 0.98);
       this.px = map.tileToWorldX(startRoom.centerX);
-      this.py = map.tileToWorldY(startRoom.centerY);
+      this.py = map.tileToWorldY(startRoom.centerY)-300;
 
       // Place the Treasure
       this.stuffLayer.putTileAt(TILES.CHEST, this.goalRoom.centerX, this.goalRoom.centerY);
