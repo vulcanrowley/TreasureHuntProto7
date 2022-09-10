@@ -52,7 +52,7 @@ var server = new Server();
 // repeating timer to reduce all players health by 1 point every 1 second (final parameters 
 // to be set in playtesting)
 //  DISABLED DURING DEVELOPMENT
-/*
+
 setInterval(()=> {
   if(players && rooms){
     Object.keys(players).forEach( function (id) {
@@ -71,7 +71,7 @@ setInterval(()=> {
   server.emit('healthUpdate',players);// was io.
  }
 },1000)// reduce health for all players once per second
-*/
+
 
 
 // establishes socket connection and player in-memory tables when new player connects
@@ -237,7 +237,7 @@ server.on('connection', function (socket) {// was io.
   socket.on('jugHit', function (jug) {
     players[socket.id].health += 10;
     
-    console.log(socket.id+ " health "+ players[socket.id].health);
+   // console.log(socket.id+ " health "+ players[socket.id].health);
     socket.to(players[socket.id].gameRoom).emit('jugRemoved', jug)
   })
 

@@ -98,7 +98,7 @@ const socket = io();
             //var game = new Phaser.Game(config);
             //game.scene.add('LobbyScene', LobbyScene, false);
             //game.scene.start('LobbyScene',{seed: seedList[gameKey]})
-             console.log("gameKey is "+gameKey)
+            //console.log("gameKey is "+gameKey)
             var game = new Phaser.Game(config);
             //console.log('sceneSeed in Game.js '+sceneSeed);
             // set active to false in config

@@ -54,7 +54,7 @@ export default class DungeonScene extends Phaser.Scene {
 
   create() {
     var self = this;
-    // MAX of 8 players per game
+    // MAX of 20 players per game
     var opponentCnt = -1;
     var playerColors =['0xff0000','0x00ff00','0xcdcdcd','0x0000ff','0x6495ED' ,'0x3366ff','0x33ccff','0xE06F8B']
    // this.gameRoom = null;

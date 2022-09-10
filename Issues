@@ -18,6 +18,7 @@ ISSUES
 -- find way to make first room max size everytime (mod Dungeon script) DONE
 ==== assign starting positions  DONE
 -- put in Ready state and simultaneos start
+-- add collision animation
 -- load up on server
 
 Note: dead player will rejoin Lobby as new player and can rejoin game that killed 
