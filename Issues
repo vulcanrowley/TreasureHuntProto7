@@ -23,3 +23,8 @@ ISSUES
 
 Note: dead player will rejoin Lobby as new player and can rejoin game that killed 
 his first incarnation - is this OK? SHOULD BE FIXED IN READY START
+
+
+Web socket timout on Render free tier
+--after 5 minutes, the WS service timesout - use https://github.com/pladaria/reconnecting-websocket
+-- to fix or upgrade to paid tier
