@@ -5,6 +5,8 @@ function Room(id){  //}, clientID) {
     const n = crypto.randomInt(0, 1000000);
     this.sceneCode = n.toString().padStart(6, "0");
     this.clients = [];
+    this.ready = false;
+    this.minPlayers =1;
     
 
 };

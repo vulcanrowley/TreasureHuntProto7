@@ -2,26 +2,24 @@ import LobbyScene from "../scenes/LobbyScene.js"
 import DungeonScene from "../scenes/DungeonScene.js"
 
 const socket = io();
-(function (socket) {
+(function (socket) {// if put $ in front, waits for web page to load
     
-    var seedList ={};
+    
 
     // handle when the create new game button is pressed
     $('#game-container').on('click', '#btn-new-game', function() {
         // create a new socket.io room and assign socket
-        socket.emit("newRoom", socket.id, (response) => {
+        var minP = 2; // minimum players for a this 
+        socket.emit("newRoom", minP, (response) => {
            
           });
     });
 
     $('#game-container').on('click', '#btn-join-game', function() {
         var roomID = $(this).data('button');
+        
         initGame(roomID,socket.id);
-        //socket.emit('join', roomID, function(data) {
-        // returns Game.id
-        //console.log("in join room "+data)
-        //initGame(data,socket.id);
-        //});
+
 
         
     });
@@ -52,10 +50,7 @@ const socket = io();
         for (key in rooms) {
             if (rooms.hasOwnProperty(key)) {
                 room = rooms[key];
-                // save seedKeys 
-                //console.log("seedList entry"+room.sceneCode )
-                seedList[room.id] = room.sceneCode;
-                //console.log(" stored as "+seedList[room.id]+" under "+room.id)
+
                 addSingleRoomToList(room);
             }
         }

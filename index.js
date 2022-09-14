@@ -57,15 +57,13 @@ setInterval(()=> {
   if(players && rooms){
     Object.keys(players).forEach( function (id) {
         if(players[id].gameRoom != null){// test if in a room
+          if(rooms[players[id].gameRoom].ready){
             players[id].health -= 1;
             if(players[id].health< 0){
                 players[id].playerStarved = true;
-                // tell every client that a player is dead
-                //io.emit('playerDisconnected', players[id].playerId);
-                //delete players[players[id]];
-                //console.log('player [' + players[id].playerId + '] disconnected')
               }
-        }
+          }
+    }    
   });
   // send msg to reduce health for all clients
   server.emit('healthUpdate',players);// was io.
@@ -85,7 +83,8 @@ server.on('connection', function (socket) {// was io.
     //console.log(`x = ${-150 + ((playerCnt % 4))*100} where mode is ${(playerCnt % 4)}`)
     //console.log(`y = ${ 100 + (100 * (Math.floor(playerCnt/4- 0.1)% 4))} where ${Math.floor(playerCnt/4- 0.1)} mode is ${Math.floor(playerCnt/4 -.1)% 4}`)
     players[socket.id] = {
-      gameRoom: null, // added for Lobby  
+      gameRoom: null, // added for Lobby 
+      ready: false, 
       health: 100,
       playerKilled: false,
       playerStarved: false,
@@ -134,8 +133,9 @@ server.on('connection', function (socket) {// was io.
 
     socket.on("newRoom", (arg1, callback) => {
         roomNo++
+
         //creatNewRoom(roomNo)//(newRoomID)
-        if(creatNewRoom(roomNo)){
+        if(creatNewRoom(roomNo, arg1)){
             
          callback(roomNo);
          }
@@ -146,10 +146,11 @@ server.on('connection', function (socket) {// was io.
 
 
 
-    function creatNewRoom(roomID){
+    function creatNewRoom(roomID, min){
         
         rooms[roomID] = new Room(roomID); //, clientID);
-        broadcastDebugMsg('new room created '  + roomID);
+        rooms[roomID].minPlayers = min;
+        broadcastDebugMsg('new room created '  + roomID + " with  min players of "+min);
         server.sockets.emit('update', rooms);
         return true;
     }
@@ -172,30 +173,31 @@ server.on('connection', function (socket) {// was io.
         //console.log("in connect client "+clientID)
         socket.join(roomID);
         players[clientID].gameRoom = roomID;
-        rooms[roomID].addClient(clientID);
 
+        rooms[roomID].addClient(clientID);
         var playerCnt = rooms[roomID].clients.length;
-        //console.log(`# of players in room ${playerCnt}`)
-        //console.log(` playerCnt mode ${Math.floor(playerCnt/4- 0.1)% 4}`)
+
+       // set loacations of players in starting room 
         players[clientID].x = -150 + (playerCnt % 4)*100, //Math.floor(Math.random() * 150) -55,// initial x position
-        players[clientID].y = 100 + (100 * (Math.floor(playerCnt/4- 0.1)% 4)), //Math.floor(Math.random() * 150) -55,// initial y position
-      
-        
-        
+        players[clientID].y = 100 + (100 * (Math.floor(playerCnt/4- 0.1)% 4)) //Math.floor(Math.random() * 150) -55,// initial y position
                    
         broadcastDebugMsg(clientID + ' has joined room: ' + roomID);
-
-        //update rooms info taht player in roomID
-        server.sockets.emit('update', rooms);
-
-        // send room specific socketIO updates
-        //console.log("total number of players "+Object.keys(players).length)
-
+        // startup player in Game/room
         //server.sockets.in(roomID).emit('currentPlayers', players);// .in(roomID)
         server.sockets.to(`${clientID}`).emit('currentPlayers', players);
         //sockets.broadcast.to sends to everyone EXCEPT originator
         socket.to(roomID).emit('newPlayer', players[socket.id])
+
+        // test if enough players to start game
+        if(playerCnt == rooms[roomID].minPlayers ){
+          //players[clientID].ready =true; // abit hack-y sending flag in player but avoids race condition if using sockets
+          rooms[roomID].ready = true;
+          server.sockets.emit('gameReady', rooms);// .in(`${clientID}`)
+        }
+
        
+        //update rooms info taht player in roomID
+        server.sockets.emit('update', rooms);
 
         return true;
     }// end of ConnectClient
