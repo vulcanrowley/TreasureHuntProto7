@@ -9,6 +9,12 @@ html {
     box-sizing: inherit;
 }
 
+#game-list-options p {
+    color: white;
+    font-size: 18px;
+    font-weight: bolder;
+}
+
 button {
     padding: 10px 40px;
     border-radius: 0px;

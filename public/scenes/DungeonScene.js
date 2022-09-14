@@ -370,7 +370,7 @@ export default class DungeonScene extends Phaser.Scene {
 
       
       this.socket.on('gameReady', function (rooms) {
-        
+        //console.log("In player gameReady")
         Object.keys(rooms).forEach(function (rm) {
           
           if(rooms[rm].id == self.player.gameRoom && rooms[rm].ready ==true){
@@ -381,11 +381,12 @@ export default class DungeonScene extends Phaser.Scene {
           }
         })
       })
-      
-        
 
+  }// end of Phaser create function
 
-  }// end of create function
+  /*
+    Helper Functions
+  */ 
 
   addPlayer(self, playerInfo) {
     // Place the player in the first room
@@ -397,14 +398,6 @@ export default class DungeonScene extends Phaser.Scene {
 
     self.player.id = playerInfo.playerId;
     self.player.gameRoom = playerInfo.gameRoom
-/*
-    if(playerInfo.ready){
-      //ready to play - set local flag for UPdate function
-      // this is a hack to avoid a race condition
-      GameReady = true;
-      
-    }
- */   
 
     self.camera.startFollow(self.player.sprite);
 
@@ -441,7 +434,7 @@ export default class DungeonScene extends Phaser.Scene {
   addOtherPlayer(self, playerInfo) {
     const playerColors =['0xff0000','0x00ff00','0xcdcdcd','0x0000ff','0x6495ED' ,'0x3366ff','0x33ccff','0xE06F8B']
     
-    this.opponentCnt++
+    this.opponentCnt++ // used to assign colors
     //console.log(`other Player added ${playerInfo.playerId}`)
     //const otherPlayer = self.physics.add.image(self.px+playerInfo.x, self.py+playerInfo.y, 'other')
     const otherPlayer = self.physics.add.sprite(self.px+playerInfo.x, self.py+playerInfo.y, "other");  
@@ -539,7 +532,7 @@ export default class DungeonScene extends Phaser.Scene {
 
   // this is the Phaser update per cycle, not the Room update function
   update() {
-    //console.log(`room ${this.player.gameRoom} `) // dont understand why this doesn;t woork
+    //console.log(`Game is Ready ${GameReady} `) 
       if( GameReady){//this.player != null){// this.player.gameRoom == GameRoom &&
         
         if(this.player.health < 0){
@@ -584,18 +577,9 @@ export default class DungeonScene extends Phaser.Scene {
 
       this.tilemapVisibility.setActiveRoom(playerRoom);
 
-    }else{
-      //display waiting for players msg
-      this.add
-      .text(100, 100, `Waiting for other players`, {
-          font: "18px monospace",
-          fill: "#000000",
-          padding: { x: 20, y: 10 },
-          backgroundColor: "#ffffff",
-      })
-      .setScrollFactor(0);
-    } // end of existing player and ready test 
-  }// rnd of Phaser Update function
+    }
+    
+  }// end of Phaser Update function
 
 }//end of Dungeon class
 

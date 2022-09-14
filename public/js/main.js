@@ -9,7 +9,9 @@ const socket = io();
     // handle when the create new game button is pressed
     $('#game-container').on('click', '#btn-new-game', function() {
         // create a new socket.io room and assign socket
-        var minP = 2; // minimum players for a this 
+        var minP = $('#playerSelect').val()//    .selectedIndex(); 
+        //console.log("minplayers "+minP)
+        // minimum players for a this 
         socket.emit("newRoom", minP, (response) => {
            
           });
@@ -17,10 +19,7 @@ const socket = io();
 
     $('#game-container').on('click', '#btn-join-game', function() {
         var roomID = $(this).data('button');
-        
         initGame(roomID,socket.id);
-
-
         
     });
 
@@ -50,19 +49,20 @@ const socket = io();
         for (key in rooms) {
             if (rooms.hasOwnProperty(key)) {
                 room = rooms[key];
-
-                addSingleRoomToList(room);
+                if(room.clients.length < room.minPlayers){
+                    addSingleRoomToList(room);
+                }
             }
         }
     });
 
     function addSingleRoomToList(room) {
-        $('#game-list-table').append(
-            '<tr class="room-list-item">'
-            + '<td>' + room.id + '</td>'
-            + '<td>' + room.clients.length + '/10</td>'
-            + '<td><button id=btn-join-game data-button=' + room.id + '>Join Game</button></td>'
-        );
+            $('#game-list-table').append(
+                '<tr class="room-list-item">'
+                + '<td>' + room.id + '</td>'
+                + '<td>' + room.clients.length + '/'+room.minPlayers+'</td>'
+                + '<td><button id=btn-join-game data-button=' + room.id + '>Join Game</button></td>'
+            );
     }
 
     function initGame(gameKey, playerID) {

@@ -21,8 +21,7 @@ ISSUES
 -- add collision animation
 -- load up on server
 
-Note: dead player will rejoin Lobby as new player and can rejoin game that killed 
-his first incarnation - is this OK? SHOULD BE FIXED IN READY START
+Note: set player count at new game button and don't start game till eveyone in - put up waiting .. sign - and also don;t allow late joiners
 
 
 Web socket timout on Render free tier
