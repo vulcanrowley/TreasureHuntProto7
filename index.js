@@ -102,7 +102,7 @@ server.on('connection', function (socket) {// was io.
 
     socket.emit('update', rooms);// was client
     broadcastDebugMsg(socket.id + ' has joined the server');
-
+    console.log(socket.id + ' has joined the server')
   //}// end of player count IF
 
   socket.on('disconnect', function() {   
@@ -120,10 +120,11 @@ server.on('connection', function (socket) {// was io.
     server.sockets.emit('update', rooms);
 
     }else{
-        console.log(" no room to delete")
+        //console.log(" no room to delete")
     }
 
     broadcastDebugMsg(socket.id + ' has disconnected from the server');
+    console.log(socket.id + ' has disconnected')
     delete players[socket.id];
     server.sockets.emit('playerDisconnected', socket.id) // was io. from original Dungeon
 });// end of disconnect

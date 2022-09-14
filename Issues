@@ -12,16 +12,17 @@ ISSUES
 -- verify all socketIO protocols work - MOSTLY DONE
 -- health downcount and display update working -DONE
 -- combat works - DONE
---- late joiner code corrects for Treasure Chest taken but doesn't reset food pots
+--- late joiner code corrects for Treasure Chest taken but doesn't reset food pots -NOT A PROBLEM
 -- exits work - DONE
 -- randomize sceneSeed when server starts - DONE
 -- find way to make first room max size everytime (mod Dungeon script) DONE
 ==== assign starting positions  DONE
--- put in Ready state and simultaneos start
+-- speciy players per new game, simultaneos start and lockout late players DONE
 -- add collision animation
--- load up on server
+-- load up on server - ONGOING
 
-Note: set player count at new game button and don't start game till eveyone in - put up waiting .. sign - and also don;t allow late joiners
+Note:   put up waiting .. sign 
+
 
 
 Web socket timout on Render free tier

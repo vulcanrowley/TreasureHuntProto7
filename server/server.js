@@ -6,7 +6,16 @@ var Server = function() {
     var app = express();
     var http = require('http').Server(app);
     var io = require('socket.io')(http);
+/*
+// possible hack for Render lack of socket IO on free tier after 5 minites
+    var ReconnectingWebSocket = require('reconnecting-websocket');
 
+    const rws = new ReconnectingWebSocket('ws://treasurehuntproto6.onrender.com');
+
+    rws.addEventListener('open', () => {
+        rws.send('hello!');
+    });
+*/
     // express static file middleware
     app.use(express.static(__dirname + '/../public'));
 

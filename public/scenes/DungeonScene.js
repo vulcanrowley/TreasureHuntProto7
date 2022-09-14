@@ -221,7 +221,7 @@ export default class DungeonScene extends Phaser.Scene {
 
       // Help text that has a "fixed" position on the screen
       this.add
-      .text(16, 16, `Get the TREASURE and carry to the EXIT`, {
+      .text(16, 16, `Find the TREASURE and carry to the EXIT`, {
           font: "18px monospace",
           fill: "#000000",
           padding: { x: 20, y: 10 },
