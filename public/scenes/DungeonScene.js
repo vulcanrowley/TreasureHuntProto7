@@ -52,7 +52,7 @@ export default class DungeonScene extends Phaser.Scene {
           spacing: 2,
       }
       );
-
+      this.load.atlas('explosion', '../assets/explosion.png', '../assets/explosion.json');
   }
 
   create() {
@@ -192,7 +192,15 @@ export default class DungeonScene extends Phaser.Scene {
       //collision with Exit tile
       this.stuffLayer.setTileIndexCallback(TILES.EXIT, this.hitExit, this);
 
-
+      const particles = this.add.particles('explosion');
+    
+      this.stuffLayer.e = particles.createEmitter({
+        frame: 'muzzleflash2',
+        lifespan: 200,
+        scale: { start: 2, end: 0 },
+        rotate: { start: 0, end: 180 },
+        on: false
+      });
 
 
       /*
@@ -410,22 +418,27 @@ export default class DungeonScene extends Phaser.Scene {
     // combat collison handler
     let debounceX = 0
     let debounceY = 0
-    self.physics.add.overlap(self.player.sprite, self.otherPlayers, (obj1, obj2) => {
+    self.physics.add.collider(self.player.sprite, self.otherPlayers, (obj1, obj2) => {
+
+      
       let id =0;
+ 
       if (debounceX != obj2.x || debounceY != obj2.y){
+
+        this.stuffLayer.e.emitParticleAt(obj2.x, obj2.y);
         // get id of obj2(target)
         // search otherplayer for the same x,y as the target, to get its Id
         self.otherPlayers.getChildren().forEach(function (otherPlayer) {
           if (otherPlayer.x == obj2.x && otherPlayer.y == obj2.y) {
             id = otherPlayer.playerId;
           }
-        });
+       });
       
         debounceX = obj2.x
         debounceY = obj2.y
         // tell server we hit target
         self.socket.emit('combatHit', { "attacker": self.player.id, "target": id})
-      } 
+     } 
 
     });
 
@@ -437,7 +450,7 @@ export default class DungeonScene extends Phaser.Scene {
     this.opponentCnt++ // used to assign colors
     //console.log(`other Player added ${playerInfo.playerId}`)
     //const otherPlayer = self.physics.add.image(self.px+playerInfo.x, self.py+playerInfo.y, 'other')
-    const otherPlayer = self.physics.add.sprite(self.px+playerInfo.x, self.py+playerInfo.y, "other");  
+    const otherPlayer = self.physics.add.sprite(self.px+playerInfo.x, self.py+playerInfo.y, "other").setPushable(false);  
     otherPlayer.playerId = playerInfo.playerId
     otherPlayer.setTint(playerColors[this.opponentCnt]);
     if(playerInfo.hasTreasure){
