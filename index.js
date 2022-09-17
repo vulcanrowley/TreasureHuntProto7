@@ -101,7 +101,7 @@ server.on('connection', function (socket) {// was io.
     //socket.broadcast.emit('newPlayer', players[socket.id])
 
     socket.emit('update', rooms);// was client
-    broadcastDebugMsg(socket.id + ' has joined the server');
+    //broadcastDebugMsg(socket.id + ' has joined the server');
     console.log(socket.id + ' has joined the server')
   //}// end of player count IF
 
@@ -123,7 +123,7 @@ server.on('connection', function (socket) {// was io.
         //console.log(" no room to delete")
     }
 
-    broadcastDebugMsg(socket.id + ' has disconnected from the server');
+    //broadcastDebugMsg(socket.id + ' has disconnected from the server');
     console.log(socket.id + ' has disconnected')
     delete players[socket.id];
     server.sockets.emit('playerDisconnected', socket.id) // was io. from original Dungeon
@@ -151,7 +151,7 @@ server.on('connection', function (socket) {// was io.
         
         rooms[roomID] = new Room(roomID); //, clientID);
         rooms[roomID].minPlayers = min;
-        broadcastDebugMsg('new room created '  + roomID + " with  min players of "+min);
+        //broadcastDebugMsg('new room created '  + roomID + " with  min players of "+min);
         server.sockets.emit('update', rooms);
         return true;
     }
@@ -182,7 +182,8 @@ server.on('connection', function (socket) {// was io.
         players[clientID].x = -150 + (playerCnt % 4)*100, //Math.floor(Math.random() * 150) -55,// initial x position
         players[clientID].y = 100 + (100 * (Math.floor(playerCnt/4- 0.1)% 4)) //Math.floor(Math.random() * 150) -55,// initial y position
                    
-        broadcastDebugMsg(clientID + ' has joined room: ' + roomID);
+        //broadcastDebugMsg(clientID + ' has joined room: ' + roomID);
+        console.log(clientID + ' has joined room: ' + roomID)
         // startup player in Game/room
         //server.sockets.in(roomID).emit('currentPlayers', players);// .in(roomID)
         server.sockets.to(`${clientID}`).emit('currentPlayers', players);
@@ -257,7 +258,7 @@ server.on('connection', function (socket) {// was io.
   socket.on('treasureHit', function (jug) {
     players[socket.id].hasTreasure = true;
     players[socket.id].color = "0xFFFF00";
-    //console.log(socket.id+ " found treasure "+" in room "+players[socket.id].gameRoom);
+    console.log(socket.id+ " found treasure" )//"+" in room "+players[socket.id].gameRoom);
     socket.to(players[socket.id].gameRoom).emit('treasureFound',{ jug:jug, player:socket.id} ) //socket.broadcast.emit
   })
 

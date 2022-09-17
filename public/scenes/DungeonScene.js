@@ -23,6 +23,7 @@ var GameRoom = null;
 export default class DungeonScene extends Phaser.Scene {
   constructor() {
     super({ key: 'DungeonScene' })
+    //put common variables here
 
   }
 

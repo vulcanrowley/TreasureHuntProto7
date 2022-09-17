@@ -4,7 +4,7 @@ es6 vs commonJs
 
 NOPE was wrong version of Phaser nedds to be 3.55.2
 
-ISSUES
+PRE-BETA ISSUES
 -- correctly adding players and others- DONE
 -- correct disconnect -FIXED
 -- all scenes have same configuration- DONE
@@ -18,10 +18,12 @@ ISSUES
 -- find way to make first room max size everytime (mod Dungeon script) DONE
 ==== assign starting positions  DONE
 -- speciy players per new game, simultaneos start and lockout late players DONE
--- add collision animation
+-- add collision animation Done
 -- load up on server - ONGOING
 
+POST BETA
 Note:   put up waiting .. sign 
+- suggest better signal that Treasure has been collected
 
 
 
