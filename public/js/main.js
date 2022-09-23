@@ -11,7 +11,7 @@ import {
   } from "@solana/web3.js";
 
  */
-/*(async function transferSOL(){
+//(async function transferSOL(){
 const getProvider = () => {
     if ('phantom' in window) {
       const provider = window.phantom?.solana;
@@ -51,8 +51,8 @@ transaction.recentBlockhash = blockhash;
 
 const { signature } = await provider.signAndSendTransaction(transaction);
 await connection.getSignatureStatus(signature);
-    })();
-*/
+//    })();
+
 
 
 /*
