@@ -1,13 +1,102 @@
 import LobbyScene from "../scenes/LobbyScene.js"
 import DungeonScene from "../scenes/DungeonScene.js"
+/*
+import {
+    Connection,
+    Keypair,
+    SystemProgram,
+    LAMPORTS_PER_SOL,
+    Transaction,
+    sendAndConfirmTransaction,
+  } from "@solana/web3.js";
 
+ */
+/*(async function transferSOL(){
+const getProvider = () => {
+    if ('phantom' in window) {
+      const provider = window.phantom?.solana;
+      if (provider?.isPhantom) {
+          //console.log("FOund Phantom")
+        return provider;
+      }
+    }
+  }
+const connection = new solanaWeb3.Connection(
+    "https://api.devnet.solana.com",
+    "confirmed"
+  );
+const provider = getProvider(); 
+
+try {
+    const resp = await provider.connect();
+    console.log(`Public Key is ${resp.publicKey.toString()}`);
+    // 26qv4GCcx98RihuK3c4T6ozB3J7L6VwCuFVc7Ta2A3Uo 
+    } catch (err) {
+    // { code: 4001, message: 'User rejected the request.' }
+}
+//provider.on("connect", () => console.log("connected!"));
+const pubKey = window.solana.publicKey; 
+const recPubkey = new  solanaWeb3.PublicKey("4GMEC5U6ka1AfeknaxcobGTL8WZxbVutYdRPsydvDSMu") //public key of receive account in string
+const transaction = new solanaWeb3.Transaction();
+transaction.add(
+    solanaWeb3.SystemProgram.transfer({
+    fromPubkey: pubKey, 
+    toPubkey: recPubkey, 
+    lamports: 1000,
+  })
+);
+transaction.feePayer = pubKey;
+let blockhash = (await connection.getLatestBlockhash("finalized")).blockhash;
+transaction.recentBlockhash = blockhash;
+
+const { signature } = await provider.signAndSendTransaction(transaction);
+await connection.getSignatureStatus(signature);
+    })();
+*/
+
+
+/*
+    // test code for access to solanaWeb3  WORKS!!
+  (async () => {
+    const fromKeypair = solanaWeb3.Keypair.generate();
+    const toKeypair = solanaWeb3.Keypair.generate();
+  
+    const connection = new solanaWeb3.Connection(
+      "https://api.devnet.solana.com",
+      "confirmed"
+    );
+  
+    const airdropSignature = await connection.requestAirdrop(
+      fromKeypair.publicKey,
+      solanaWeb3.LAMPORTS_PER_SOL
+    );
+  
+    await connection.confirmTransaction(airdropSignature);
+  
+    const lamportsToSend = 1_000_000;
+  
+    const transferTransaction = new solanaWeb3.Transaction().add(
+        solanaWeb3.SystemProgram.transfer({
+        fromPubkey: fromKeypair.publicKey,
+        toPubkey: toKeypair.publicKey,
+        lamports: lamportsToSend,
+      })
+    );
+  console.log(" sent to "+toKeypair.publicKey)
+    
+    await solanaWeb3.sendAndConfirmTransaction(connection, transferTransaction, [
+      fromKeypair,
+    ]);
+  })();
+*/
 const socket = io();
-(function (socket) {// if put $ in front, waits for web page to load
+(function (socket) {// runs immediately, once. if put $ in front, waits for web page to load
     
     
 
     // handle when the create new game button is pressed
-    $('#game-container').on('click', '#btn-new-game', function() {
+    $('#game-container').on('click', '#btn-new-game', function(event) {
+        event.preventDefault;
         // create a new socket.io room and assign socket
         var minP = $('#playerSelect').val()//    .selectedIndex(); 
         //console.log("minplayers "+minP)
@@ -49,6 +138,7 @@ const socket = io();
         for (key in rooms) {
             if (rooms.hasOwnProperty(key)) {
                 room = rooms[key];
+                // keep adding players to count until fill, then don't display LOgin option
                 if(room.clients.length < room.minPlayers){
                     addSingleRoomToList(room);
                 }
