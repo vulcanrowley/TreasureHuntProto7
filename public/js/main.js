@@ -11,7 +11,18 @@ import {
   } from "@solana/web3.js";
 
  */
-//(async function transferSOL(){
+//(async () => { // function transferSOL
+$(function () { // needs to have prepend $ to make load first
+    $( '#solana-wallet' ).on( "click", function( event ) {
+        event.preventDefault();
+        console.log("Button pressed")
+        // open Phantom Wallet   or got to download site 
+
+    });
+})      
+
+/*
+// opens Phantom Wallet    
 const getProvider = () => {
     if ('phantom' in window) {
       const provider = window.phantom?.solana;
@@ -27,6 +38,7 @@ const connection = new solanaWeb3.Connection(
   );
 const provider = getProvider(); 
 
+// see what account we are using
 try {
     const resp = await provider.connect();
     console.log(`Public Key is ${resp.publicKey.toString()}`);
@@ -34,7 +46,9 @@ try {
     } catch (err) {
     // { code: 4001, message: 'User rejected the request.' }
 }
+
 //provider.on("connect", () => console.log("connected!"));
+// build transaction to send 1000 lamports to recPubkey from Wallet
 const pubKey = window.solana.publicKey; 
 const recPubkey = new  solanaWeb3.PublicKey("4GMEC5U6ka1AfeknaxcobGTL8WZxbVutYdRPsydvDSMu") //public key of receive account in string
 const transaction = new solanaWeb3.Transaction();
@@ -45,14 +59,17 @@ transaction.add(
     lamports: 1000,
   })
 );
+
+// some data that Sign needs
 transaction.feePayer = pubKey;
 let blockhash = (await connection.getLatestBlockhash("finalized")).blockhash;
 transaction.recentBlockhash = blockhash;
 
+// Ask wallet to sign transaction and , if approved, send SOL to recPubkey
 const { signature } = await provider.signAndSendTransaction(transaction);
 await connection.getSignatureStatus(signature);
-//    })();
-
+//})();
+*/
 
 
 /*
@@ -91,7 +108,13 @@ await connection.getSignatureStatus(signature);
 */
 const socket = io();
 (function (socket) {// runs immediately, once. if put $ in front, waits for web page to load
-    
+    /*  determine mobile device 
+            const isMobile = () => {
+        return !!navigator.userAgent.match(
+            /(iPhone|iPod|Android|ios|iOS|iPad|Backerry|WebOS|Symbian|Windows Phone|Phone)/i
+        );
+        };
+    */
     
 
     // handle when the create new game button is pressed

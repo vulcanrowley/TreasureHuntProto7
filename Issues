@@ -20,10 +20,19 @@ PRE-BETA ISSUES
 -- speciy players per new game, simultaneos start and lockout late players DONE
 -- add collision animation Done
 -- load up on server - ONGOING
+-- wall collision not working in mouse click movement
+--- turns out that tweens dont play well with colliders,
+--- options 
+------ give up on animation and just use sprites and collider
+------ use overlap and tween and write custom "bounce" call back
+
+-- otherPlayer update not working
 
 POST BETA
 Note:   put up waiting .. sign 
 - suggest better signal that Treasure has been collected
+- replace or supplement arrow movement with click/pointer movement
+- add in SOL wallet and send transaction as well as NFT minting
 
 
 

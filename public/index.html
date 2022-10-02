@@ -14,6 +14,7 @@
 <body>
     <h1 style="font-size:48px; text-align:center;">Treasure Hunt</h1>
     <!--<button onclick="connectWallet()">Connect to Solana</button>-->
+    <button id="solana-wallet">Connect to Solana</button>
     
     <br>
        <!--<div id="debug"></div>--> 
@@ -56,17 +57,20 @@
     <script src="/js/main.js" type="module"></script>
     
     <script>
-        async function connectWallet(){
-            try {
-            const resp = await window.solana.connect();
-            pubKey = resp.publicKey.toString();
-            //resp.connectWallet.
-            console.log("Connected to the server? "+window.solana.isConnected+" and your public key is "+pubKey);   }catch (err) {
-            }
-        }
+
     </script>
 </body>
 
 </html>
+<!--
+async function connectWallet(){
+    try {
+    const resp = await window.solana.connect();
+    pubKey = resp.publicKey.toString();
+    //resp.connectWallet.
+    console.log("Connected to the server? "+window.solana.isConnected+" and your public key is "+pubKey);   }catch (err) {
+    }
+}
+-->
         
 
