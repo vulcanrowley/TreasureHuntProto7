@@ -236,20 +236,23 @@ server.on('connection', function (socket) {// was io.
   socket.on('playerMovement', function (movementData) {
     players[socket.id].x = movementData.x
     players[socket.id].y = movementData.y
-    console.log(`arrow loc ${movementData.x}, ${movementData.y}`)
+    //console.log(`arrow loc ${movementData.x}, ${movementData.y}`)
     //const targetRoom = players[socket.id].room
     //console.log(socket.id+ " moved "+ movementData.x);
     //Sends msg to all other players that socket.id has moved
     socket.to(players[socket.id].gameRoom).emit('playerMoved', players[socket.id])
   })
 
+  /* Not Needed - playerMovement updates server
   // tells everyone else in game room that player is moving to new target location
   socket.on('clickLocation',function(data){
     //console.log('click to '+data.x+', '+data.y);
     players[socket.id].x = data.x;
     players[socket.id].y = data.y;
-    socket.to(players[socket.id].gameRoom).emit('clickMove',players[socket.id]);
+
+    //socket.to(players[socket.id].gameRoom).emit('clickMove',players[socket.id]);
 });
+*/
 
   // a player died while carrying the Treasure - tell everyone to reset location to original spot
   socket.on('resetTreasure', function () {

@@ -196,7 +196,7 @@ export default class DungeonScene extends Phaser.Scene {
       //collision with Exit tile
       this.stuffLayer.setTileIndexCallback(TILES.EXIT, this.hitExit, this);
       //collision player with wall
-      this.groundLayer.setTileIndexCallback([39,57, 58, 59,21,76, 95, 114,19,77, 96, 115,1,78, 79, 80,3,4,22,23], this.hitWall, this);
+      this.groundLayer.setTileIndexCallback([39,57, 58, 59,21,76, 95, 114,19,77, 96, 115,1,78, 79, 80,3,4,22], this.hitWall, this);
 
       const particles = this.add.particles('explosion');
     
@@ -235,7 +235,8 @@ export default class DungeonScene extends Phaser.Scene {
         self.movePlayer(self, {x:gameX,y:gameY})
 
         // set flag to let Phaser update and Player update know that click has set new target
-        self.socket.emit('clickLocation', { "x": pointer.x, "y": pointer.y})
+        //self.socket.emit('clickLocation', { "x": pointer.x, "y": pointer.y})
+        //self.socket.emit('playerLocation', { "x": pointer.x, "y": pointer.y})
 
       }, this);
 
@@ -332,6 +333,8 @@ export default class DungeonScene extends Phaser.Scene {
           }
         })
       })
+
+/*  Code below not needed if rely on update from player thru server      
 // added to use mouse click as imputs - should be able to consolidate with 'playerMoved'
       this.socket.on('clickMove', function (playerInfo) {
         self.otherPlayers.getChildren().forEach(function (otherPlayer) {
@@ -341,7 +344,7 @@ export default class DungeonScene extends Phaser.Scene {
             // so setPosition works
 
             //otherPlayer.setPosition(playerInfo.x, playerInfo.y)  // uses arrow keys
-/*
+
             let distance = Phaser.Math.Distance.Between(otherPlayer.x,otherPlayer.y,playerInfo.x,playerInfo.y);
             let duration = Math.floor(distance*10);
             
@@ -354,13 +357,13 @@ export default class DungeonScene extends Phaser.Scene {
               
             });
 
-*/
+
 
 
           }
         })
       })
-
+*/
       this.socket.on('jugRemoved', function(jug){
         //console.log('other jug '+jug.x+" , "+jug.y);
         self.removeItem(jug);
@@ -664,7 +667,7 @@ export default class DungeonScene extends Phaser.Scene {
       // send update to server
       var x = this.player.sprite.x
       var y = this.player.sprite.y
-      //console.log(" player: "+this.player.id+"  "+x+" , "+y);
+      
       
       if (this.player.oldPosition && (x !== this.player.oldPosition.x || y !== this.player.oldPosition.y )) {
         // move player health value with player
@@ -676,9 +679,9 @@ export default class DungeonScene extends Phaser.Scene {
         this.player.Htext.setTintFill(0x00ff00)
         if(this.player.health < 30){this.player.Htext.setTintFill(0xff0000);}
 
-
+        console.log(" player: "+this.player.id+"  "+x+" , "+y);
         // tell server where we moved to UPDATE moved to tween
-        //this.socket.emit('playerMovement', { x: this.player.sprite.x, y: this.player.sprite.y})
+        this.socket.emit('playerMovement', { x: this.player.sprite.x, y: this.player.sprite.y})
       }
   
       this.player.oldPosition = {

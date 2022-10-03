@@ -22,11 +22,9 @@ PRE-BETA ISSUES
 -- load up on server - ONGOING
 -- wall collision not working in mouse click movement
 --- turns out that tweens dont play well with colliders,
---- options 
------- give up on animation and just use sprites and collider
------- use overlap and tween and write custom "bounce" call back
+----- resolution: leverage setTileIndexCallback - use callback to turn off tween when it hits a wall
 
--- otherPlayer update not working
+-- otherPlayer update not working FIXED but sends lots of data to server
 
 POST BETA
 Note:   put up waiting .. sign 
