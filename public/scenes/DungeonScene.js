@@ -68,8 +68,8 @@ export default class DungeonScene extends Phaser.Scene {
       //  - Doors should be at least 2 tiles away from corners, so that we can place a corner tile on
       //    either side of the door location
       this.dungeon = new Dungeon({
-      width: 30,
-      height:30,
+      width: 150,// 200 generate ~300 rooms; 250 creates ~450; 150 creates ~150 ; 100 about 70 rooms
+      height:150,
       doorPadding: 2,
       randomSeed: this.sceneSeed,//this.level,
       rooms: {
@@ -88,16 +88,16 @@ export default class DungeonScene extends Phaser.Scene {
           width: this.dungeon.width,
           height: this.dungeon.height,
       });
+
       //console.log(`scene seed is ${this.sceneSeed}`)
       console.log(' number of rooms - '+this.dungeon.rooms.length);
+
       const tileset = map.addTilesetImage("tiles", null, 48, 48, 1, 2); // 1px margin, 2px spacing
       this.groundLayer = map.createBlankLayer("Ground", tileset).fill(TILES.BLANK);
       this.stuffLayer = map.createBlankLayer("Stuff", tileset);
       const shadowLayer = map.createBlankLayer("Shadow", tileset).fill(TILES.BLANK);
 
       this.tilemapVisibility = new TilemapVisibility(shadowLayer);
-
-
 
       // Use the array of rooms generated to place tiles in the map
       // Note: using an arrow function here so that "this" still refers to our scene
@@ -224,8 +224,6 @@ export default class DungeonScene extends Phaser.Scene {
       ////// END of DUNGEON GENERATION
 
       // Added for click recognition
-      //this.stuffLayer.inputEnabled = true; // Allows clicking on the map ; it's enough to do it on the last layer
-      //this.stuffLayer.events.onInputUp.add(self.getCoordinates, this);
       
       this.input.on('pointerdown', function (pointer) {
         let gameX = Math.floor(pointer.worldX);
