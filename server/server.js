@@ -6,7 +6,7 @@ var Server = function() {
     var app = express();
     var http = require('http').Server(app);
     var io = require('socket.io')(http);
-    const web3 = require('@solana/web3.js');// not sure this is needed at server level
+    //const web3 = require('@solana/web3.js');// not sure this is needed at server level
 
     // express static file middleware
     app.use(express.static(__dirname + '/../public'));
