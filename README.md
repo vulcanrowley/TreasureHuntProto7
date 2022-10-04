@@ -14,6 +14,7 @@ Multiprocesssor socket IO based on https://github.com/ivangfr/socketio-express-p
 Dungeon generation based on Mike West Dungeon see https://github.com/mikewesthad/dungeon
   and this article https://itnext.io/modular-game-worlds-in-phaser-3-tilemaps-3-procedural-dungeon-3bc19b841cd
 Lobby concepts based on 
+CLick Movement based on ideas in https://github.com/Jerenaux/basic-mmo-phaser.git and synchroization based on https://www.dynetisgames.com/2017/03/19/client-updates-phaser-quest/
 
 DevLog:7/9/22
 Most of localhost version running except combat and health decay disabled during dev - updated COMPLETED

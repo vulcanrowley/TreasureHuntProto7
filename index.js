@@ -33,6 +33,10 @@
 // include our custom server configuration
 var Server = require('./server/server.js');
 var Room = require('./server/room.js');
+//const web3 = require('@solana/web3.js');
+//const solanaWeb3 = require('@solana/web3.js');
+//const {Keypair, Transaction, SystemProgram, LAMPORTS_PER_SOL} = require("@solana/web3.js");
+
 
 // Server Game code maintaining player's states and using socketIO to update clients
 /////////////////////////////////////////////////////////////////////////////////
@@ -83,16 +87,15 @@ server.on('connection', function (socket) {// was io.
     //console.log(`x = ${-150 + ((playerCnt % 4))*100} where mode is ${(playerCnt % 4)}`)
     //console.log(`y = ${ 100 + (100 * (Math.floor(playerCnt/4- 0.1)% 4))} where ${Math.floor(playerCnt/4- 0.1)} mode is ${Math.floor(playerCnt/4 -.1)% 4}`)
     players[socket.id] = {
-      gameRoom: null, // added for Lobby 
-      ready: false, 
+      gameRoom: null, // added for Lobby  
       health: 100,
       playerKilled: false,
       playerStarved: false,
       hasTreasure: false,
       x: 0,//-150 + (playerCnt % 4)*100, //Math.floor(Math.random() * 150) -55,// initial x position
       y: 0,//100 + (100 * (Math.floor(playerCnt/4- 0.1)% 4)), //Math.floor(Math.random() * 150) -55,// initial y position
-      playerId: socket.id,
-      color: null//playerColor//getPlayerColor()//getRandomColor()// but not gold
+      playerId: socket.id
+      
     }
     
    
@@ -178,7 +181,7 @@ server.on('connection', function (socket) {// was io.
         rooms[roomID].addClient(clientID);
         var playerCnt = rooms[roomID].clients.length;
 
-       // set loacations of players in starting room 
+       // set locations of players in starting room 
         players[clientID].x = -150 + (playerCnt % 4)*100, //Math.floor(Math.random() * 150) -55,// initial x position
         players[clientID].y = 100 + (100 * (Math.floor(playerCnt/4- 0.1)% 4)) //Math.floor(Math.random() * 150) -55,// initial y position
                    
@@ -233,11 +236,23 @@ server.on('connection', function (socket) {// was io.
   socket.on('playerMovement', function (movementData) {
     players[socket.id].x = movementData.x
     players[socket.id].y = movementData.y
+    //console.log(`arrow loc ${movementData.x}, ${movementData.y}`)
     //const targetRoom = players[socket.id].room
     //console.log(socket.id+ " moved "+ movementData.x);
     //Sends msg to all other players that socket.id has moved
     socket.to(players[socket.id].gameRoom).emit('playerMoved', players[socket.id])
   })
+
+  /* Not Needed - playerMovement updates server
+  // tells everyone else in game room that player is moving to new target location
+  socket.on('clickLocation',function(data){
+    //console.log('click to '+data.x+', '+data.y);
+    players[socket.id].x = data.x;
+    players[socket.id].y = data.y;
+
+    //socket.to(players[socket.id].gameRoom).emit('clickMove',players[socket.id]);
+});
+*/
 
   // a player died while carrying the Treasure - tell everyone to reset location to original spot
   socket.on('resetTreasure', function () {

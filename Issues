@@ -20,10 +20,17 @@ PRE-BETA ISSUES
 -- speciy players per new game, simultaneos start and lockout late players DONE
 -- add collision animation Done
 -- load up on server - ONGOING
+-- wall collision not working in mouse click movement
+--- turns out that tweens dont play well with colliders,
+----- resolution: leverage setTileIndexCallback - use callback to turn off tween when it hits a wall
+
+-- otherPlayer update not working FIXED but sends lots of data to server
 
 POST BETA
 Note:   put up waiting .. sign 
 - suggest better signal that Treasure has been collected
+- replace or supplement arrow movement with click/pointer movement
+- add in SOL wallet and send transaction as well as NFT minting
 
 
 
