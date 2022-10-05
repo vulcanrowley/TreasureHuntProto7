@@ -107,6 +107,7 @@ await connection.getSignatureStatus(signature);
   })();
 */
 const socket = io();
+var minP =1;
 (function (socket) {// runs immediately, once. if put $ in front, waits for web page to load
     /*  determine mobile device 
             const isMobile = () => {
@@ -121,7 +122,7 @@ const socket = io();
     $('#game-container').on('click', '#btn-new-game', function(event) {
         event.preventDefault;
         // create a new socket.io room and assign socket
-        var minP = $('#playerSelect').val()//    .selectedIndex(); 
+        minP = $('#playerSelect').val()//    .selectedIndex(); 
         //console.log("minplayers "+minP)
         // minimum players for a this 
         socket.emit("newRoom", minP, (response) => {
@@ -131,7 +132,7 @@ const socket = io();
 
     $('#game-container').on('click', '#btn-join-game', function() {
         var roomID = $(this).data('button');
-        initGame(roomID,socket.id);
+        initGame(roomID,minP);
         
     });
 
@@ -178,7 +179,7 @@ const socket = io();
             );
     }
 
-    function initGame(gameKey, playerID) {
+    function initGame(gameKey, numPlayers) {
         $('#game-list-options').remove()
         $('#debug').remove()
         $('#game-container').append(
@@ -215,6 +216,6 @@ const socket = io();
             game.scene.add('DungeonScene', DungeonScene, false);
             //game.scene.start('DungeonScene',{seed: gameKey,gameRoom:gameKey})
             
-            game.scene.start('DungeonScene',{seed:gameKey, playerID:socket.id, socket: socket })
+            game.scene.start('DungeonScene',{seed:gameKey, playerID:socket.id, socket: socket,numPlayers:numPlayers })
     }
 })(socket);

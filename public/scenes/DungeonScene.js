@@ -38,6 +38,7 @@ export default class DungeonScene extends Phaser.Scene {
       this.gameKey = data.seed; // game room is the same as the sceneSeed
       this.playerID = data.playerID;
       this.socket = data.socket;
+      this.numPlayers = data.numPlayers;
 
 };
       
@@ -70,8 +71,8 @@ export default class DungeonScene extends Phaser.Scene {
       //  - Doors should be at least 2 tiles away from corners, so that we can place a corner tile on
       //    either side of the door location
       this.dungeon = new Dungeon({
-      width: 150,// 200 generate ~300 rooms; 250 creates ~450; 150 creates ~150 ; 100 about 70 rooms
-      height:150,
+      width: 100 + (self.numPlayers-1)*50,// 200 generate ~300 rooms; 250 creates ~450; 150 creates ~150 ; 100 about 70 rooms
+      height:100 + (self.numPlayers-1)*50,
       doorPadding: 2,
       randomSeed: this.sceneSeed,//this.level,
       rooms: {
