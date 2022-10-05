@@ -22,9 +22,9 @@ PRE-BETA ISSUES
 -- load up on server - ONGOING
 -- wall collision not working in mouse click movement
 --- turns out that tweens dont play well with colliders,
------ resolution: leverage setTileIndexCallback - use callback to turn off tween when it hits a wall
+----- resolution: leverage setTileIndexCallback - use callback to turn off tween when it hits a wall - well not so easy
 
--- otherPlayer update not working FIXED but sends lots of data to server
+-- otherPlayer update not working - FIXED but sends lots of data to server
 
 POST BETA
 Note:   put up waiting .. sign 
@@ -75,3 +75,31 @@ cut from package-json
     "@solana/web3.js": "^1.62.0",
     "browserify": "^17.0.0",
     "defi": "file:../../..",
+
+
+    in hitWall at 47, 26 : wall at 46, 27 DungeonScene.js:609:13
+bounce right DungeonScene.js:612:15
+bounce up DungeonScene.js:623:15
+in hitWall at 47, 26 : wall at 47, 27 DungeonScene.js:609:13
+bounce up DungeonScene.js:623:15
+in hitWall at 46, 27 : wall at 46, 27 3 DungeonScene.js:609:13
+in hitWall at 46, 27 : wall at 46, 28 DungeonScene.js:609:13
+bounce up DungeonScene.js:623:15
+in hitWall at 46, 27 : wall at 46, 27 DungeonScene.js:609:13
+in hitWall at 46, 27 : wall at 46, 28 DungeonScene.js:609:13
+bounce up DungeonScene.js:623:15
+in hitWall at 46, 27 : wall at 46, 27 DungeonScene.js:609:13
+in hitWall at 46, 27 : wall at 46, 28 DungeonScene.js:609:13
+bounce up DungeonScene.js:623:15
+in hitWall at 46, 27 : wall at 46, 27 DungeonScene.js:609:13
+in hitWall at 46, 27 : wall at 46, 28 DungeonScene.js:609:13
+bounce up DungeonScene.js:623:15
+onComplete tween at 2220, 1329 DungeonScene.js:594:15
+in hitWall at 46, 27 : wall at 46, 27 DungeonScene.js:609:13
+in hitWall at 46, 27 : wall at 46, 28 DungeonScene.js:609:13
+bounce up DungeonScene.js:623:15
+in hitWall at 46, 27 : wall at 46, 27 DungeonScene.js:609:13
+in hitWall at 46, 27 : wall at 46, 28 DungeonScene.js:609:13
+bounce up DungeonScene.js:623:15
+in hitWall at 46, 27 : wall at 46, 27 DungeonScene.js:609:13
+in hitWall at 46, 27 : wall at 46, 28

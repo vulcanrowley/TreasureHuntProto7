@@ -21,6 +21,8 @@ import TilemapVisibility from "/js/tilemap-visibility.js";
 var GameReady = false;
 var GameRoom = null;
 var tween = null;
+var stopTween = false;
+
 export default class DungeonScene extends Phaser.Scene {
   constructor() {
     super({ key: 'DungeonScene' })
@@ -196,7 +198,7 @@ export default class DungeonScene extends Phaser.Scene {
       //collision with Exit tile
       this.stuffLayer.setTileIndexCallback(TILES.EXIT, this.hitExit, this);
       //collision player with wall
-      this.groundLayer.setTileIndexCallback([39,57, 58, 59,21,76, 95, 114,19,77, 96, 115,1,78, 79, 80,3,4,22], this.hitWall, this);
+      this.groundLayer.setTileIndexCallback([39,57, 58, 59,21,76, 95, 114,19,77, 96, 115,1,78, 79, 80,3,4,22,23], this.hitWall, this);
 
       const particles = this.add.particles('explosion');
     
@@ -226,15 +228,51 @@ export default class DungeonScene extends Phaser.Scene {
       // Added for click recognition
       
       this.input.on('pointerdown', function (pointer) {
-        let gameX = Math.floor(pointer.worldX);
+        let gameX = Math.floor(pointer.worldX);// not Tile loc
         let gameY = Math.floor(pointer.worldY);
-        //console.log(`down at ${gameX}, ${gameY}`);
+
+        /*  checking to see if pointer is in room doesn't work- keeps from getting to other rooms
+        //check for legal click
+
+        // convert to local coord
+        let pointerTileX = this.groundLayer.worldToTileX(gameX);
+        let pointerTileY = this.groundLayer.worldToTileY(gameY);
+        // get room sprite is in
+        const playerTileX = this.groundLayer.worldToTileX(this.player.sprite.x);
+        const playerTileY = this.groundLayer.worldToTileY(this.player.sprite.y);
+        const pointerRoom = this.dungeon.getRoomAt(playerTileX, playerTileY);
+
+        
+        // test for between left and right wall
+        let sideTest = pointerTileX >= pointerRoom.x && pointerTileX <= pointerRoom.x+pointerRoom.width ? true : false;
+        let vertTest = pointerTileY >= pointerRoom.y && pointerTileY <= pointerRoom.y+pointerRoom.height ? true : false;
+
+        let doorTest = false;
+        const doors = pointerRoom.getDoorLocations();
+        for (let i = 0; i < doors.length; i++) {
+          if(doors[i].x +pointerRoom.x == pointerTileX  && doors[i].y+pointerRoom.y == pointerTileY){
+            doorTest = true;
+          }
+        }
+
+        //const doorTest = doors.includes({pointerTileX,pointerTileY})
+        // test if between top and botton walls
+
+        console.log(` worldX ${pointerTileX}, worldY ${pointerTileY}`)
+        console.log(`left is ${pointerRoom.x}, right ${pointerRoom.x+pointerRoom.width}, top ${pointerRoom.y}, bottom ${pointerRoom.y+pointerRoom.height}`)
+        console.log(`test ${sideTest}, ${vertTest}, ${doorTest}`)
+        //console.log(`down at ${gameX} = ${}, ${gameY} = ${}`);
         // not sure why has to be 10X
-        self.movePlayer(self, {x:gameX,y:gameY})
+        if(doorTest || sideTest && vertTest){
+          self.movePlayer(self, {x:gameX,y:gameY})
+        }
+        
 
         // set flag to let Phaser update and Player update know that click has set new target
         //self.socket.emit('clickLocation', { "x": pointer.x, "y": pointer.y})
         //self.socket.emit('playerLocation', { "x": pointer.x, "y": pointer.y})
+        */ // end of room check idea
+        self.movePlayer(self, {x:gameX,y:gameY})
 
       }, this);
 
@@ -453,14 +491,17 @@ export default class DungeonScene extends Phaser.Scene {
 
 
       let distance = Phaser.Math.Distance.Between(self.player.sprite.x,self.player.sprite.y,pointer.x,pointer.y);
-      let duration = Math.floor(distance*10);
+      let duration = Math.floor(distance*5);
       
       tween = this.tweens.add({
         targets: self.player.sprite.anims.play("player-walk", true),
         ease: 'Linear',
         x:pointer.x,
         y:pointer.y,
-        duration:duration
+        duration:duration//,
+        //onComplete: _=> console.log("tween ends"),
+        //onUpdate: self.onCompleteHandler,
+        //onUpdateParams: [ pointer.x,pointer.y ]
         
       });
 
@@ -483,27 +524,32 @@ export default class DungeonScene extends Phaser.Scene {
 
     //Watch the player and tilemap layers for collisions, for the duration of the scene:
     // Floor collisions excluded, only WALL collisions at this layer
-    let debounceX = 0
-    let debounceY = 0
-    self.physics.add.collider(self.player.sprite, self.groundLayer);
-      /*
-      ,(p,w) => {
-      if (debounceX != p.x || debounceY != p.y){
-        console.log('hit wall')
-        tween.stop();
-        // back up
-        
-      }  
+
+    self.physics.add.collider(self.player.sprite, self.groundLayer)
+    /*
+    , (player, wall) => {
+      
+      let pX = this.groundLayer.worldToTileX(player.x);
+      let pY = this.groundLayer.worldToTileY(player.y);
+      console.log(`hit wall at ${pX}, ${pY}`)
+      let tileBounce = 5;
+      if(pX >= wall.x){
+        this.player.sprite.x += tileBounce;
+      } else{this.player.sprite.x -= tileBounce;}
+  
+      if(pY >= wall.y){
+        this.player.sprite.y += tileBounce;
+      } else{this.player.sprite.y -= tileBounce;} 
     });
-    */
+*/
 
     //self.physics.add.overlap(self.player.sprite, self.groundLayer, overlapHappened, null, this);
 
     self.physics.add.collider(self.player.sprite, self.stuffLayer);
 
     // combat collison handler
-    debounceX = 0
-    debounceY = 0
+    let debounceX = 0
+    let debounceY = 0
     self.physics.add.collider(self.player.sprite, self.otherPlayers, (obj1, obj2) => {
       let id =0;
  
@@ -582,23 +628,45 @@ export default class DungeonScene extends Phaser.Scene {
     //console.log("hit jug at"+tile.x+" , "+tile.y)
   }
 
+  onCompleteHandler (tween, targets, Tx,Ty)
+  {
+      console.log(`Update tween at ${Tx}, ${Ty}`);
+  
+  }
+  
+
   hitWall (sprite, tile)
   // callback on sprite/layer collision
   // stop the tween movement at the wall
   // backup slightly to break collision
   {
+    stopTween = true;
+    //tween.stop(); 
+    //tween.on('update', (tween, targets, Tx,Ty) =>{
+    //  console.log(`update x is ${Tx}`)
+    //});
+    //tween.on('stop', listener);
+
     const pX = this.groundLayer.worldToTileX(this.player.sprite.x);
     const pY = this.groundLayer.worldToTileY(this.player.sprite.y);
+    //console.log(`in hitWall at ${pX}, ${pY} : wall at ${tile.x}, ${tile.y}`)
+    let tileBounce = 10;
+    if(pX > tile.x){
+      console.log(`bounce right`)
+      this.player.sprite.x += tileBounce;
 
-    tween.stop(); 
+    } else if (pX < tile.x){
+      console.log(`bounce left`)
+      this.player.sprite.x -= tileBounce;
+    }
+    
 
-    if(pX >= tile.x){
-      this.player.sprite.x += 2;
-    } else{this.player.sprite.x -= 2;}
-
-    if(pY >= tile.y){
-      this.player.sprite.y += 2;
-    } else{this.player.sprite.y -= 2;}
+    if(pY > tile.y){
+      console.log(`bounce down`)
+      this.player.sprite.y += tileBounce +3;
+    } else if(pY < tile.y){
+      console.log(`bounce up`)
+      this.player.sprite.y -= tileBounce;}
     
   }
 
@@ -660,7 +728,12 @@ export default class DungeonScene extends Phaser.Scene {
         }else{
           //this.player.update();
         }
-         
+      
+      //check if tween needs to be stopped
+      if(stopTween){
+        tween.stop();
+        stopTween = false;
+      }
       
       // send update to server
       var x = this.player.sprite.x
@@ -677,7 +750,7 @@ export default class DungeonScene extends Phaser.Scene {
         this.player.Htext.setTintFill(0x00ff00)
         if(this.player.health < 30){this.player.Htext.setTintFill(0xff0000);}
 
-        console.log(" player: "+this.player.id+"  "+x+" , "+y);
+        //console.log(" player: "+this.player.id+"  "+x+" , "+y);
         // tell server where we moved to UPDATE moved to tween
         this.socket.emit('playerMovement', { x: this.player.sprite.x, y: this.player.sprite.y})
       }
