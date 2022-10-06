@@ -25,7 +25,7 @@ export default class Player {
       repeat: -1,
     });
 
-    this.sprite = scene.physics.add.sprite(x, y, "characters", 0).setSize(22, 33).setOffset(23, 27);
+    this.sprite = scene.physics.add.sprite(x, y, "characters", 0).setSize(22, 33).setOffset(23, 27).setPushable(false);
     this.x = this.sprite.x;
     this.y = this.sprite.y;
     this.sprite.anims.play("player-walk-back");
@@ -40,6 +40,7 @@ export default class Player {
   }
 
   update() {
+    
     //console.log("getting player updated")
     const keys = this.keys;
     const sprite = this.sprite;
@@ -82,6 +83,7 @@ export default class Player {
 
 
     }
+    
   }
 
   destroy() {

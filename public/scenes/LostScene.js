@@ -55,7 +55,7 @@ export default class LostScene extends Phaser.Scene {
         cam.fadeOut(15000,0xff0000)
         cam.once("camerafadeoutcomplete", () => {
             console.log("leaving game as loser")
-            window.location.replace('http://localhost:3000/')
+            window.location.replace('localhost:3000')//('http://www.rowleycryptogames.com/')
             this.scene.remove();
             //this.sys.game.destroy(true);
         });

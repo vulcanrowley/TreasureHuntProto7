@@ -1,10 +1,4 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="utf-8">
-    </head>
-    <body>
-<!DOCTYPE html>
+
 <html>
 
 <head lang="en">
@@ -18,7 +12,10 @@
 </head>
 
 <body>
-    <center><h1 style="font-size:48px;">Treasure Hunt</h1></center>
+    <h1 style="font-size:48px; text-align:center;">Treasure Hunt</h1>
+    <!--<button onclick="connectWallet()">Connect to Solana</button>-->
+    <button id="solana-wallet">Connect to Solana</button>
+    
     <br>
        <!--<div id="debug"></div>--> 
         <div id="game-container">
@@ -53,10 +50,27 @@
     
     <script src="//cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.js"></script>
 
+    <!--<script src="https://unpkg.com/@solana/spl-token@latest/lib/index.iife.min.js"></script></script>-->
+    <!--<script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.js"></script>-->
+    <!--<script src="/js/solanaWeb3.browser.js" type="module"></script>-->
     
     <script src="/js/main.js" type="module"></script>
+    
+    <script>
+
+    </script>
 </body>
 
 </html>
+<!--
+async function connectWallet(){
+    try {
+    const resp = await window.solana.connect();
+    pubKey = resp.publicKey.toString();
+    //resp.connectWallet.
+    console.log("Connected to the server? "+window.solana.isConnected+" and your public key is "+pubKey);   }catch (err) {
+    }
+}
+-->
         
 
