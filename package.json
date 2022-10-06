@@ -5,10 +5,6 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
-<<<<<<< HEAD
-=======
-    
->>>>>>> 998969deffd70c8eda58b92962c53045cecbb307
   },
   "author": "",
   "license": "ISC",
@@ -17,10 +13,7 @@
     "express": "^4.17.1",
     "install": "^0.13.0",
     "jquery": "~2.2.0",
-<<<<<<< HEAD
-=======
     "npm": "^8.19.2",
->>>>>>> 998969deffd70c8eda58b92962c53045cecbb307
     "phaser": "^3.24.1",
     "socket.io": "^3.0.3"
   }
