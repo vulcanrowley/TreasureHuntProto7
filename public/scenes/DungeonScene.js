@@ -288,8 +288,8 @@ export default class DungeonScene extends Phaser.Scene {
       
 
       // Help text that has a "fixed" position on the screen
-     self.textMsg = this.add
-      .text(16, 16, `Waiting for more players`, {
+      this.add
+      .text(16, 16, `Find the TREASURE and carry to the EXIT`, {
           font: "18px monospace",
           fill: "#000000",
           padding: { x: 20, y: 10 },
@@ -475,7 +475,6 @@ export default class DungeonScene extends Phaser.Scene {
             //ready to play - set local flag for UPdate function
             
             GameReady = true;
-            self.textMsg.setText('Find the TREASURE and carry to the EXIT')
             //self.gameReady = true;
           }
         })
